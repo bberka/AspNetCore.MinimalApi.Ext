@@ -42,6 +42,8 @@ Any class that has wants to expose an endpoint will need to have this attribute 
 * Name - set this if you don't want to use the class name. Setting as null will exlude the path prefix (i.e. /Sample/TestEndpoint will become /TestEndpoint)
 * AuthenticationRequired - Default No. This will apply to all child methods, unless explicitly stated by the method
 * Roles - Array of role names required for authorization.
+* RouteType - Default Post. Can combine using bitwise OR operator (i.e RouteType.Post | RouteType.Get)
+* EndpointFilters - Types that implements IEndpointFilter.
 
 #### Sample with override
 ```csharp
@@ -55,13 +57,13 @@ By using this on any method in a class that uses EndpointAPIAttribute, it will c
 * Name - set this if you don't want to use the class name.
 * AuthenticationRequired - Default Inherit.
 * Roles - Array of role names required for authorization.
-* MethodType - Default Post. Can combine using bitwise OR operator (i.e MethodTypeEnum.Post | MethodTypeEnum.Get)
-* PrefixOverride - Override the url prefix from the parent.
-* EndpointFilter - Type that implements IEndpointFilter
+* RouteType - Default Inherit. Can combine using bitwise OR operator (i.e RouteType.Post | RouteType.Get)
+* UrlPrefixOverride - Override the url prefix from the parent.
+* EndpointFilter - Default Inherit. Type that implements IEndpointFilter.
 
 #### Sample with parameters
 ```csharp
-[EndpointMethod(Name = "NewName", MethodType = MethodTypeEnum.POST | MethodTypeEnum.PUT)]
+[EndpointMethod(Name = "NewName", RouteType = RouteType.POST | RouteType.PUT)]
 ```
 
 ## IBuilderServiceSetup and IApplicationSetup

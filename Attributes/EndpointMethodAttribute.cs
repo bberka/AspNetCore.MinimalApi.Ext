@@ -2,12 +2,13 @@
 namespace Selfrated.MinimalAPI.Middleware.Attributes;
 
 [Flags]
-public enum MethodTypeEnum
+public enum RouteType
 {
     GET = 1,
     POST = 2,
     PUT = 4,
-    DELETE = 8
+    DELETE = 8,
+    Inherit = 16
 }
 
 public enum AuthenticationRequired
@@ -21,22 +22,13 @@ public enum AuthenticationRequired
 public class EndpointMethodAttribute : Attribute
 {
     public string? Name { get; set; } = null;
-    public bool? RequireAuthentication
-    {
-        get
-        {
-            if (AuthenticationRequired == AuthenticationRequired.Inherit)
-                return null;
-
-            return AuthenticationRequired == AuthenticationRequired.Yes;
-        }
-    }
     public AuthenticationRequired AuthenticationRequired { get; set; } = AuthenticationRequired.Inherit;
+    
+    public RouteType RouteType { get; set; } = RouteType.Inherit;
+
+    public string? UrlPrefixOverride { get; set; } = null;
+    
     public string[]? Roles { get; set; } = null;
-    public MethodTypeEnum MethodType { get; set; } = MethodTypeEnum.POST;
-
-    public string? PrefixOverride { get; set; } = null;
-
-    public Type? EndpointFilter { get; set; }
+    public Type[]? EndpointFilters { get; set; }
 
 }

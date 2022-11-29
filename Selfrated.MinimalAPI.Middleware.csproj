@@ -13,6 +13,7 @@
     <PackageTags>MinimalAPI;Middleware;Endpoints;ASPNetCore</PackageTags>
     <Authors>Edward Elyn</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <Version>1.0.2</Version>
   </PropertyGroup>
   <ItemGroup>
 	  <FrameworkReference Include="Microsoft.AspNetCore.App" />
