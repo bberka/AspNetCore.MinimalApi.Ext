@@ -12,14 +12,14 @@
     <RepositoryUrl>https://github.com/edelyn/Selfrated.MinimalAPI.Middleware</RepositoryUrl>
     <PackageTags>MinimalAPI;Middleware;Endpoints;ASPNetCore</PackageTags>
     <Authors>Edward Elyn</Authors>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <Version>1.0.2</Version>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
 	  <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="README.md">
+    <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

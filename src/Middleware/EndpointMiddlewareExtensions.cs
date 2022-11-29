@@ -25,11 +25,11 @@ public static class EndpointMiddlewareExtensions
     public static void UseEndpoints(this WebApplication app, EndpointMiddlewareOptions options)
     {
         //get all assemblies that have the EndpointAPIAttribute attribute
-        var results = Assembly.GetCallingAssembly().ExportedTypes
+        var results = Assembly.GetEntryAssembly().ExportedTypes
                                     .Select(itemType => new
                                     {
                                         itemType,
-                                        attribute = itemType.GetCustomAttribute<EndpointAPIAttribute>()
+                                        attribute = itemType.GetCustomAttributes<EndpointAPIAttribute>(false).FirstOrDefault()
                                     }
                                     ).ToList();
 
@@ -154,22 +154,27 @@ public static class EndpointMiddlewareExtensions
     {
         var urlPrefix = methodAttribute?.UrlPrefixOverride ?? classAttribute?.Name;
 
-        if (urlPrefix != null)
+        //blank string means no prefix
+        if (urlPrefix != "")
         {
-            if (string.IsNullOrEmpty(urlPrefix))
+            if (urlPrefix != null)
             {
-                //empty is className
-                urlPrefix = $"{className.Replace("Endpoint", "")}/";
+                if (string.IsNullOrEmpty(urlPrefix))
+                {
+                    //empty is className
+                    urlPrefix = $"{className.Replace("Endpoint", "")}/";
+                }
+                else
+                {
+                    urlPrefix = $"{urlPrefix}/";
+                }
             }
-            else
+            else //null is blank
             {
-                urlPrefix = $"{urlPrefix}/";
+                urlPrefix = "";
             }
         }
-        else //null is blank
-        {
-            urlPrefix = "";
-        }
+        
 
         var actionName = methodAttribute?.Name;
 
