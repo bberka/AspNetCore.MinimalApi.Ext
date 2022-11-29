@@ -41,7 +41,7 @@ public class MethodAttributeSettings
         return "Hello World!";
     }
 
-    [EndpointMethod(UrlPrefixOverride = null)]
+    [EndpointMethod(UrlPrefixOverride = "")]
     public string HelloWorldNoPathPrefix()
     {
         return "Hello World!";

@@ -152,26 +152,26 @@ public static class EndpointMiddlewareExtensions
 
     static string GetUrlPath(EndpointMiddlewareOptions options, EndpointAPIAttribute? classAttribute, string className, EndpointMethodAttribute? methodAttribute, string methodName)
     {
-        var urlPrefix = methodAttribute?.UrlPrefixOverride ?? classAttribute?.Name;
+        var prefix = methodAttribute.UrlPrefixOverride == null ? classAttribute.Name == "" ? className : classAttribute.Name : methodAttribute.UrlPrefixOverride == "" ? null : methodAttribute.UrlPrefixOverride;
 
         //blank string means no prefix
-        if (urlPrefix != "")
+        if (prefix != "")
         {
-            if (urlPrefix != null)
+            if (prefix != null)
             {
-                if (string.IsNullOrEmpty(urlPrefix))
+                if (string.IsNullOrEmpty(prefix))
                 {
                     //empty is className
-                    urlPrefix = $"{className.Replace("Endpoint", "")}/";
+                    prefix = $"{className.Replace("Endpoint", "")}/";
                 }
                 else
                 {
-                    urlPrefix = $"{urlPrefix}/";
+                    prefix = $"{prefix}/";
                 }
             }
             else //null is blank
             {
-                urlPrefix = "";
+                prefix = "";
             }
         }
         
@@ -183,7 +183,7 @@ public static class EndpointMiddlewareExtensions
             actionName = methodName;
         }
 
-        return $"/{urlPrefix}{actionName}";
+        return $"/{prefix}{actionName}";
     }
 
     static Type GetDelegateType(MethodInfo method)
