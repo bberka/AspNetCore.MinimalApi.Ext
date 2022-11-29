@@ -7,7 +7,7 @@ public class EndpointAPIAttribute : Attribute
     {
     }
 
-    public string? UrlPrefix { get; set; } = "";
+    public string? Name { get; set; } = "";
     public bool RequireAuthentication
     {
         get

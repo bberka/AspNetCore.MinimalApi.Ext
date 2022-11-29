@@ -36,7 +36,7 @@ public static class EndpointMiddlewareExtensions
 
             foreach (var method in methods.Where(e => e.attribute != null))
             {
-                var urlPrefix = method.attribute?.PrefixOverride ?? match.attribute?.UrlPrefix;
+                var urlPrefix = method.attribute?.PrefixOverride ?? match.attribute?.Name;
 
                 if (urlPrefix != null)
                 {

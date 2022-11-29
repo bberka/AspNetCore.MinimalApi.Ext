@@ -8,9 +8,20 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>Minimal API Middleware and Attributes</Title>
     <Description>Middleware and Attributes to simplify Minimal API Development</Description>
+    <PackageProjectUrl>https://github.com/edelyn/Selfrated.MinimalAPI.Middleware</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/edelyn/Selfrated.MinimalAPI.Middleware</RepositoryUrl>
+    <PackageTags>MinimalAPI;Middleware;Endpoints;ASPNetCore</PackageTags>
+    <Authors>Edward Elyn</Authors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
 	  <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
