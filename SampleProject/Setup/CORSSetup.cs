@@ -3,7 +3,7 @@ using Selfrated.MinimalAPI.Middleware;
 
 namespace SampleProject.Setup;
 
-public class CORS : IApplicationSetup, IBuilderServiceSetup
+public class CORSSetup : IApplicationSetup, IBuilderServiceSetup
 {
     internal string _myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
