@@ -11,6 +11,6 @@ var app = builder.Build();
 app.UseApplicationSetup();
 
 //if using EndpointAttributes (Minimal API)
-app.UseEndpoints();
+app.UseEndpointsAPIAttributes();
 
 app.Run();

@@ -16,7 +16,7 @@ public static class EndpointMiddlewareExtensions
         public Type[] EndpointFilters { get; set; } = Array.Empty<Type>();
     }
 
-    public static void UseEndpoints(this WebApplication app)
+    public static void UseEndpointsAPIAttributes(this WebApplication app)
     {
         var options = new EndpointMiddlewareOptions();
         UseEndpoints(app, options);

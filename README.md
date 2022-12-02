@@ -110,7 +110,7 @@ This is a complete Program.cs file!
     app.UseApplicationSetup();
 
     //if using EndpointAttributes (Minimal API)
-    app.UseEndpoints();
+    app.UseEndpointsAPIAttributes();
 
     app.Run();
 ```
