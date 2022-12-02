@@ -6,9 +6,6 @@ namespace SampleProject.Setup;
 
 public class SwaggerSetup : IBuilderServiceSetup, IApplicationSetup
 {
-    internal readonly string _title = "Sample Project";
-    internal readonly string _version = "v1";
-
     public void InitializeApplication(WebApplication app)
     {
         var swaggerSettings = app.Configuration.GetSection("SwaggerSettings").Get<SwaggerSettings>() ?? new();
