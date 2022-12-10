@@ -3,7 +3,7 @@
 namespace SampleProject.Endpoints;
 
 [EndpointAPI(Name = null)]
-public class ClassAttributeSettingsNoPrefix
+public class ClassAttributeSettingsNoPrefixEndpoint
 {
     [EndpointMethod]
     public string HelloWorld()

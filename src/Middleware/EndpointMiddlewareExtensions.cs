@@ -164,7 +164,7 @@ public static class EndpointMiddlewareExtensions
                 if (string.IsNullOrEmpty(prefix))
                 {
                     //empty is className
-                    prefix = $"{className.Replace("Endpoint", "")}/";
+                    prefix = $"{className}/";
                 }
                 else
                 {
@@ -175,6 +175,11 @@ public static class EndpointMiddlewareExtensions
             {
                 prefix = "";
             }
+
+            //remove the last Endpoint if it exists
+            if (prefix.ToLower().EndsWith("endpoint/"))
+                prefix = prefix.Substring(0, prefix.Length - 9) + "/";
+                
         }
         
 
