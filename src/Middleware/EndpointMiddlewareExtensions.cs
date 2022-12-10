@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Selfrated.MinimalAPI.Middleware.Attributes;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -90,8 +91,9 @@ public static class EndpointMiddlewareExtensions
                         {
                             if (typeof(IEndpointFilter).IsAssignableFrom(filterItem))
                             {
-                                //instantiate the filter
-                                var filter = Activator.CreateInstance(filterItem) as IEndpointFilter;
+                                IServiceCollection services = new ServiceCollection();
+
+                                var filter = ActivatorUtilities.CreateInstance(app.Services, filterItem) as IEndpointFilter;
 
                                 if (filter != null)
                                     call.AddEndpointFilter(filter);

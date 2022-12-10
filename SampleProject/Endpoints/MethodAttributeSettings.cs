@@ -46,4 +46,16 @@ public class MethodAttributeSettings
     {
         return "Hello World!";
     }
+
+    [EndpointMethod(Name = "CustomName/{id}")]
+    public string CustomNameWithUrlParams(string id)
+    {
+        return $"Hello {id}!";
+    }
+
+    [EndpointMethod(Name = "Hi/There/Method/Addtribute/Settings/{id}", RouteType = RouteType.GET)]
+    public string LongPath(string id)
+    {
+        return $"Hello {id}!";
+    }
 }
