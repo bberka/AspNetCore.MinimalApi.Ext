@@ -7,11 +7,9 @@ namespace SampleProject.Filters;
 /// </summary>
 public class SampleEndpointFilter : IEndpointFilter
 {
-    private readonly MemoryCache _cache;
 
-    public SampleEndpointFilter(MemoryCache cache)
+    public SampleEndpointFilter()
     {
-        _cache = cache;
     }
 
     public async ValueTask<object?> InvokeAsync(
@@ -19,7 +17,7 @@ public class SampleEndpointFilter : IEndpointFilter
             EndpointFilterDelegate next)
     {
         var id = context.Arguments.FirstOrDefault().ToString();
-        
+      
         if (id == "1234")
         {
             return await next(context);

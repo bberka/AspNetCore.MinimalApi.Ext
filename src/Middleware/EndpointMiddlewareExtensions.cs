@@ -3,215 +3,231 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Selfrated.MinimalAPI.Middleware.Attributes;
 using System.Linq.Expressions;
+using System.Net;
 using System.Reflection;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing.Patterns;
+using Selfrated.Middleware.Models;
+using Microsoft.AspNetCore.Mvc.Filters;
+using System.Xml.Linq;
+using Selfrated.Middleware;
 
 namespace Selfrated.MinimalAPI.Middleware;
 
 public static class EndpointMiddlewareExtensions
 {
-    public class EndpointMiddlewareOptions
-    {
-        public RouteType RouteType { get; set; } = RouteType.POST;
-        public bool AuthenticationRequired { get; set; } = false;
-        public string[] Roles { get; set; } = Array.Empty<string>();
-        public Type[] EndpointFilters { get; set; } = Array.Empty<Type>();
-    }
+  public class EndpointMiddlewareOptions
+  {
+    //public bool AuthenticationRequired { get; set; } = false;
+    public AuthorizeData? AuthorizeData { get; set; } = null;
 
-    public static void UseEndpointsAPIAttributes(this WebApplication app)
-    {
-        var options = new EndpointMiddlewareOptions();
-        UseEndpoints(app, options);
-    }
+    public Type[] EndpointFilters { get; set; } = Array.Empty<Type>();
 
-    public static void UseEndpoints(this WebApplication app, EndpointMiddlewareOptions options)
-    {
-        //get all assemblies that have the EndpointAPIAttribute attribute
-        var results = Assembly.GetEntryAssembly().ExportedTypes
-                                    .Select(itemType => new
-                                    {
-                                        itemType,
-                                        attribute = itemType.GetCustomAttributes<EndpointAPIAttribute>(false).FirstOrDefault()
-                                    }
-                                    ).ToList();
+    /// <summary>
+    /// Sets global prefix for all routes.
+    /// </summary>
+    public string? GlobalPrefix { get; set; } = null;
+    internal bool UseGlobalPrefix => !string.IsNullOrWhiteSpace(GlobalPrefix) && GlobalPrefix != "";
 
-        foreach (var classType in results.Where(e => e.attribute != null))
-        {
-            //instantiate the class
-            var instance = Activator.CreateInstance(classType.itemType);
 
-            if (instance == null)
-                continue;
+  }
+  public static void UseEndpointsAPIAttributes(this WebApplication app, Action<EndpointMiddlewareOptions> action) {
+    var options = new EndpointMiddlewareOptions();
+    action(options);
+    UseEndpoints(app, options);
+  }
+  public static void UseEndpointsAPIAttributes(this WebApplication app, EndpointMiddlewareOptions options) {
+    UseEndpoints(app, options);
+  }
+  public static void UseEndpointsAPIAttributes(this WebApplication app) {
+    var options = new EndpointMiddlewareOptions();
+    UseEndpoints(app, options);
+  }
+  private static string GetContainingFolderName(Type type) {
+    var name = type.Namespace;
+    //var name = assembly.;
+    var split = name.Split('.');
+    return split[split.Length - 1];
+   
+  }
+  private static void UseEndpoints(this WebApplication app, EndpointMiddlewareOptions options) {
+    //get all assemblies that have the EndpointAPIAttribute attribute
+    var entryAssembly = Assembly.GetEntryAssembly();
+    var mainName = entryAssembly?.GetName().Name ?? throw new ArgumentNullException(nameof(entryAssembly));
+    var results = entryAssembly?.ExportedTypes
+      .Select(itemType => new ExportedTypeResult() {
+        Type = itemType,
+        Attribute = itemType.GetCustomAttributes<EndpointAPIAttribute>(false).FirstOrDefault(),
+      })
+      .Where(e => e.Attribute != null && e.Type != null && e.Type is not null)
+      .ToList();
+    if (results is null) return;
 
-            //get methods that have the EndpointMethodAttribute
-            var methods = instance.GetType().GetMethods().Select(method => new
-            {
-                method,
-                attribute = method.GetCustomAttribute<EndpointMethodAttribute>()
-            });
+    foreach (var classType in results) {
+      //instantiate the class
+      var classInstance = Activator.CreateInstance(classType.Type);
 
-            foreach (var method in methods.Where(e => e.attribute != null))
-            {
-                var methodDelegate = method.method.CreateDelegate(
-                                        GetDelegateType(method.method),
-                                        instance);
+      if (classInstance == null)
+        continue;
 
-                var path = GetUrlPath(options, classType.attribute, classType.itemType.Name, method.attribute, method.method.Name);
+      //get methods that have the EndpointMethodAttribute
+      var methods = classType.Type.GetMethods()
+        .Where(x => x.IsPublic && x.Name == "Handle")
+        .Select(method => new ExportedMethodResult() {
+        Method = method,
+        Attribute = method.GetCustomAttribute<EndpointMethodAttribute>()
+      })
+        .ToList();
 
-                var methodTypes = GetMethodTypes(options, classType.attribute, method.attribute);
+      foreach (var method in methods) {
+        var methodDelegate = method.Method.CreateDelegate(
+                                GetDelegateType(method.Method),
+                                classInstance);
 
-                foreach (RouteType enumValue in Enum.GetValues(typeof(RouteType)))
-                {
-                    RouteHandlerBuilder? call = null;
+        var path = GetUrlPath(options, classType.Attribute, classType.Type.Name, GetContainingFolderName(classType.Type), mainName);
 
-                    switch (methodTypes & enumValue)
-                    {
-                        case RouteType.POST:
-                            call = app.MapPost(path, methodDelegate);
-                            break;
-                        case RouteType.GET:
-                            call = app.MapGet(path, methodDelegate);
-                            break;
-                        case RouteType.PUT:
-                            call = app.MapPut(path, methodDelegate);
-                            break;
-                        case RouteType.DELETE:
-                            call = app.MapDelete(path, methodDelegate);
-                            break;
-                    }
+        var methodTypes = GetHttpMethodTypes(options, method.Method);
 
-                    if (call != null)
-                    {
-                        if (GetAuthRequired(options, classType.attribute, method.attribute))
-                            call.RequireAuthorization();
+        foreach (var httpMethod in methodTypes) {
+          var call = (httpMethod) switch {
+            "POST" => app.MapPost(path, methodDelegate),
+            "GET" => app.MapGet(path, methodDelegate),
+            "PUT" => app.MapPut(path, methodDelegate),
+            "DELETE" => app.MapDelete(path, methodDelegate),
+            _ => null,
+          };
 
-                        foreach (var role in GetAuthenticationRoles(options, classType.attribute, method.attribute) ?? Array.Empty<string>())
-                            call.RequireAuthorization(role);
+          if (call == null) continue;
+          if (options.AuthorizeData is not null) {
+            call.RequireAuthorization(options.AuthorizeData);
+          }
 
-                        foreach (var filterItem in GetEndpointFilters(options,classType.attribute,method.attribute) ?? Array.Empty<Type>())
-                        {
-                            if (typeof(IEndpointFilter).IsAssignableFrom(filterItem))
-                            {
-                                IServiceCollection services = new ServiceCollection();
+          var authData = GetAuthorizeData(options, classType.Type, method.Method);
+          if (authData is not null) {
+            call.RequireAuthorization(authData);
+          }
 
-                                var filter = ActivatorUtilities.CreateInstance(app.Services, filterItem) as IEndpointFilter;
+          var filters = GetHttpFiltersByType(options, classType.Type, method.Method);
+          foreach (var filterItem in filters) {
+            if (ActivatorUtilities.CreateInstance(app.Services, filterItem) is IEndpointFilter filter)
+              call.AddEndpointFilter(filter);
+          }
 
-                                if (filter != null)
-                                    call.AddEndpointFilter(filter);
-                            }
-                        }
-
-                    }
-                }
-            }
-
+          var globalFilters = options.EndpointFilters;
+          foreach (var filterItem in globalFilters) {
+            if (ActivatorUtilities.CreateInstance(app.Services, filterItem) is IEndpointFilter filter)
+              call.AddEndpointFilter(filter);
+          }
         }
+      }
+
+    }
+  }
+  private static Type[] GetHttpFiltersByType(EndpointMiddlewareOptions options, Type classType, MethodInfo method) {
+    var methodAttributes = method.CustomAttributes;
+
+    var filterTypes = methodAttributes
+      .Select(attributeData => attributeData.AttributeType)
+      .Where(attributeType => typeof(Attribute).IsAssignableFrom(attributeType) && typeof(IEndpointFilter).IsAssignableFrom(attributeType))
+      .ToList();
+
+    var classAttributes = classType.CustomAttributes;
+
+    filterTypes.AddRange(classAttributes
+        .Select(attributeData => attributeData.AttributeType)
+        .Where(attributeType => typeof(Attribute).IsAssignableFrom(attributeType) && typeof(IEndpointFilter).IsAssignableFrom(attributeType)));
+
+    return filterTypes.ToArray() ?? Array.Empty<Type>();
+  }
+
+  //private static Type[]? GetEndpointFilters(EndpointMiddlewareOptions options, EndpointAPIAttribute? classAttribute, EndpointMethodAttribute? methodAttribute) {
+  //  if (methodAttribute?.EndpointFilters != null)
+  //    return methodAttribute?.EndpointFilters;
+
+  //  if (classAttribute?.EndpointFilters != null)
+  //    return classAttribute?.EndpointFilters;
+
+  //  return options.EndpointFilters;
+  //}
+
+
+
+  private static string[] GetHttpMethodTypes(EndpointMiddlewareOptions options, MethodInfo method) {
+    var methods = method.CustomAttributes
+      .Where(x => x.AttributeType.BaseType == typeof(HttpMethodAttribute))
+      .Select(x => GetHttpMethodStringFromAttributeName(x.AttributeType))
+      .ToArray();
+    if (methods.Length == 0) return new[] { "GET" };
+    return methods;
+
+    static string GetHttpMethodStringFromAttributeName(Type? type) {
+      if (typeof(HttpGetAttribute) == type) return "GET";
+      if (typeof(HttpPostAttribute) == type) return "POST";
+      if (typeof(HttpPutAttribute) == type) return "PUT";
+      if (typeof(HttpDeleteAttribute) == type) return "DELETE";
+      return "GET";
+    }
+  }
+
+  private static IAuthorizeData? GetAuthorizeData(EndpointMiddlewareOptions options, Type classType, MethodInfo methodType) {
+    return methodType.GetCustomAttributes<AuthorizeAttribute>().FirstOrDefault()
+      ?? classType.GetCustomAttributes<AuthorizeAttribute>().FirstOrDefault();
+  
+  }
+
+  private static string GetUrlPath(EndpointMiddlewareOptions options, EndpointAPIAttribute classAttribute, string className, string controllerName, string entryAssemblyMainName) {
+    var sb = new StringBuilder();
+    sb.Append("/");
+    if (options.UseGlobalPrefix) {
+      sb.Append(options.GlobalPrefix);
+      sb.Append("/");
     }
 
-    static Type[]? GetEndpointFilters(EndpointMiddlewareOptions options, EndpointAPIAttribute? classAttribute, EndpointMethodAttribute? methodAttribute)
-    {
-        if (methodAttribute?.EndpointFilters != null)
-            return methodAttribute?.EndpointFilters;
-
-        if (classAttribute?.EndpointFilters != null)
-            return classAttribute?.EndpointFilters;
-
-        return options.EndpointFilters;
+    if (classAttribute.UseRoute) {
+      sb.Append(classAttribute.Route);
+      sb.Append("/");
+      return FixUrl(sb).ToString();
     }
 
-    static string[]? GetAuthenticationRoles(EndpointMiddlewareOptions options, EndpointAPIAttribute? classAttribute, EndpointMethodAttribute? methodAttribute)
-    {
-        if (methodAttribute?.Roles != null)
-            return methodAttribute?.Roles;
-
-        if (classAttribute?.Roles != null)
-            return classAttribute?.Roles;
-
-        return options.Roles;
+    var canUse = !controllerName.Equals("Endpoints", StringComparison.OrdinalIgnoreCase) &&
+                 !controllerName.Equals(entryAssemblyMainName, StringComparison.OrdinalIgnoreCase);
+    if (!canUse) {
+      sb.Append(className);
+      sb.Append("/");
+      return FixUrl(sb).ToString();
     }
 
-    static RouteType? GetMethodTypes(EndpointMiddlewareOptions options, EndpointAPIAttribute? classAttribute, EndpointMethodAttribute? methodAttribute)
-    {
-        if (methodAttribute?.RouteType != RouteType.Inherit)
-            return methodAttribute?.RouteType;
+    sb.Append(controllerName);
+    sb.Append("/");
+    sb.Append(className);
+    sb.Append("/");
+    return FixUrl(sb).ToString();
 
-        if (classAttribute?.RouteType != RouteType.Inherit)
-            return classAttribute?.RouteType;
+    StringBuilder FixUrl(StringBuilder sb) {
+      return sb.Replace("//", "/");
+    }
+  }
 
-        //make sure not set to inherit
-        return options.RouteType != RouteType.Inherit ? options.RouteType : RouteType.POST;
+  private static Type GetDelegateType(MethodInfo method) {
+    List<Type> args = new List<Type>(
+        method.GetParameters().Select(p => p.ParameterType));
+
+    Type delegateType;
+
+    if (method.ReturnType == typeof(void)) {
+      delegateType = Expression.GetActionType(args.ToArray());
+    }
+    else {
+      args.Add(method.ReturnType);
+      delegateType = Expression.GetFuncType(args.ToArray());
     }
 
-    static bool GetAuthRequired(EndpointMiddlewareOptions options, EndpointAPIAttribute? classAttribute, EndpointMethodAttribute? methodAttribute)
-    {
-        if (methodAttribute?.AuthenticationRequired != AuthenticationRequired.Inherit)
-            return methodAttribute?.AuthenticationRequired == AuthenticationRequired.Yes;
-
-        if (classAttribute?.AuthenticationRequired != AuthenticationRequired.Inherit)
-            return classAttribute?.AuthenticationRequired == AuthenticationRequired.Yes;
-
-        return options.AuthenticationRequired;
-    }
-
-    static string GetUrlPath(EndpointMiddlewareOptions options, EndpointAPIAttribute? classAttribute, string className, EndpointMethodAttribute? methodAttribute, string methodName)
-    {
-        var prefix = methodAttribute.UrlPrefixOverride == null ? classAttribute.Name == "" ? className : classAttribute.Name : methodAttribute.UrlPrefixOverride == "" ? null : methodAttribute.UrlPrefixOverride;
-
-        //blank string means no prefix
-        if (prefix != "")
-        {
-            if (prefix != null)
-            {
-                if (string.IsNullOrEmpty(prefix))
-                {
-                    //empty is className
-                    prefix = $"{className}/";
-                }
-                else
-                {
-                    prefix = $"{prefix}/";
-                }
-            }
-            else //null is blank
-            {
-                prefix = "";
-            }
-
-            //remove the last Endpoint if it exists
-            if (prefix.ToLower().EndsWith("endpoint/"))
-                prefix = prefix.Substring(0, prefix.Length - 9) + "/";
-                
-        }
-        
-
-        var actionName = methodAttribute?.Name;
-
-        if (string.IsNullOrEmpty(actionName))
-        {
-            actionName = methodName;
-        }
-
-        return $"/{prefix}{actionName}";
-    }
-
-    static Type GetDelegateType(MethodInfo method)
-    {
-        List<Type> args = new List<Type>(
-            method.GetParameters().Select(p => p.ParameterType));
-
-        Type delegateType;
-
-        if (method.ReturnType == typeof(void))
-        {
-            delegateType = Expression.GetActionType(args.ToArray());
-        }
-        else
-        {
-            args.Add(method.ReturnType);
-            delegateType = Expression.GetFuncType(args.ToArray());
-        }
-
-        return delegateType;
-    }
+    return delegateType;
+  }
 }
 
 
