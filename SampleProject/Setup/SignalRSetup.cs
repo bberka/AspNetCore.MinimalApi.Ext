@@ -1,23 +1,19 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Identity.Web;
-using SampleProject.Classes;
-using SampleProject.Hubs;
-using Selfrated.MinimalAPI.Middleware;
+﻿using AspNetCore.MinimalApi.Ext.Middleware;
+using AspNetCore.MinimalApi.Ext.Sample.Hubs;
 
-namespace SampleProject.Setup;
+namespace AspNetCore.MinimalApi.Ext.Sample.Setup;
 
 public class SignalRSetup : IApplicationSetup, IBuilderServiceSetup
 {
-    public void InitializeApplication(WebApplication app)
-    {
-        app.UseDefaultFiles();
-        app.UseStaticFiles();
+  public void InitializeApplication(WebApplication app) {
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
 
-        app.MapHub<ChatHub>("/chat");
-    }
+    app.MapHub<ChatHub>("/chat");
+  }
 
-    public void InitializeServices(IServiceCollection services, ConfigurationManager configuration, ConfigureHostBuilder host)
-    {
-        services.AddSignalR();
-    }
+  public void InitializeServices(IServiceCollection services, ConfigurationManager configuration,
+    ConfigureHostBuilder host) {
+    services.AddSignalR();
+  }
 }

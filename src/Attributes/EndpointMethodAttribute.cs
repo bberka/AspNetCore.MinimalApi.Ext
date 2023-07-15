@@ -1,20 +1,17 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCore.MinimalApi.Ext.Enums;
 
-namespace Selfrated.MinimalAPI.Middleware.Attributes;
+namespace AspNetCore.MinimalApi.Ext.Attributes;
 
+[AttributeUsage(AttributeTargets.Class)]
+public class EndpointMethodAttribute : Attribute
+{
+  public EndpointMethodAttribute(HttpMethodTypes httpMethodTypes) {
+    HttpMethods = new[] { httpMethodTypes };
+  }
 
+  public EndpointMethodAttribute(params HttpMethodTypes[] httpMethod) {
+    HttpMethods = httpMethod;
+  }
 
-
-//[AttributeUsage(AttributeTargets.Method)]
-//public class EndpointMethodAttribute : Attribute
-//{
-//  //public string? Name { get; set; } = null;
-
-//  //internal bool UseName => string.IsNullOrWhiteSpace(Name) && Name != "";
-
-//  //public string? UrlPrefixOverride { get; set; } = null;
-
-//  //internal bool UseUrlPrefixOverride => string.IsNullOrWhiteSpace(UrlPrefixOverride) && UrlPrefixOverride != "";
-
-//}
+  public HttpMethodTypes[] HttpMethods { get; set; }
+}

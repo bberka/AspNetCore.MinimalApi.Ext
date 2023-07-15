@@ -1,10 +1,12 @@
 ﻿using System.Reflection;
-using Selfrated.MinimalAPI.Middleware.Attributes;
 
-namespace Selfrated.Middleware.Models;
+namespace AspNetCore.MinimalApi.Ext.Models;
 
-public class ExportedMethodResult
+internal class ExportedMethodResult
 {
+  public ExportedMethodResult(MethodInfo method) {
+    Method = method;
+  }
+
   public MethodInfo Method { get; set; }
-  public EndpointMethodAttribute? Attribute { get; set; }
 }

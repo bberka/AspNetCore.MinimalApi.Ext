@@ -1,31 +1,14 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-
-namespace SampleProject.Filters;
+﻿namespace AspNetCore.MinimalApi.Ext.Sample.Classes;
 
 /// <summary>
-/// This is an example of a custom filter that can be used to authorize/validate a request.
+///   This is an example of a custom filter that can be used to authorize/validate a request.
 /// </summary>
 public class SampleEndpointFilter : IEndpointFilter
 {
-
-    public SampleEndpointFilter()
-    {
-    }
-
-    public async ValueTask<object?> InvokeAsync(
-            EndpointFilterInvocationContext context,
-            EndpointFilterDelegate next)
-    {
-        var id = context.Arguments.FirstOrDefault().ToString();
-      
-        if (id == "1234")
-        {
-            return await next(context);
-        }
-        else
-        {
-            return Results.Unauthorized();
-        }
-    }
+  public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next) {
+    var idFromQuery = context.HttpContext.Request.Query["id"].FirstOrDefault();
+    if (idFromQuery != "1234") context.HttpContext.Response.StatusCode = 401;
+    return await next(context);
+  }
 }
 

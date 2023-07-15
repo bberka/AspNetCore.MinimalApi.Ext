@@ -1,19 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCore.MinimalApi.Ext.Attributes;
+using AspNetCore.MinimalApi.Ext.Enums;
 using Microsoft.AspNetCore.Mvc;
-using Selfrated.Middleware;
-using Selfrated.MinimalAPI.Middleware.Attributes;
 
-namespace SampleProject.Endpoints.Product;
+namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints.Product;
 
-[EndpointAPI]
-[AllowAnonymous]
-
-public class Count : BaseEndpointSync
-  .WithoutRequest
-  .WithResult<int>
+[EndpointAuthorize]
+[EndpointRoute("TestRoute")]
+[EndpointMethod(HttpMethodTypes.POST)]
+public class Count : BaseEndpointSync.WithoutRequest.WithResult<int>
 {
   [HttpGet]
-  public override int Handle() {
+  public override int Handle(HttpContext context) {
     return new Random().Next();
   }
 }

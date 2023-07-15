@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace Selfrated.Middleware;
+namespace AspNetCore.MinimalApi.Ext;
 
 public class AuthorizeData : IAuthorizeData
 {

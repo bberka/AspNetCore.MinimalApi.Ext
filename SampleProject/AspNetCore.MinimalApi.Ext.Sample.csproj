@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Selfrated.MinimalAPI.Middleware.csproj" />
+    <ProjectReference Include="..\src\AspNetCore.MinimalApi.Ext.csproj" />
   </ItemGroup>
 
 </Project>

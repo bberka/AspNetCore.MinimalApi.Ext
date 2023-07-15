@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Caching.Memory;
-using SampleProject.Hubs;
-using Selfrated.MinimalAPI.Middleware.Attributes;
-
-namespace SampleProject.Endpoints;
+﻿namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints;
 
 //[EndpointAPI]
 //public class ProductsEndpoint
@@ -16,7 +11,7 @@ namespace SampleProject.Endpoints;
 
 //    internal string _cacheKey = "Products";
 
-//    [EndpointMethod(RouteType = RouteType.GET, AuthenticationRequired = AuthenticationRequired.Yes)]
+//    [EndpointMethodAttribute(RouteType = RouteType.GET, AuthenticationRequired = AuthenticationRequired.Yes)]
 //    public IResult GetAllProducts(MemoryCache cache)
 //    {
 //        var products = cache.Get<List<Product>>(_cacheKey) ?? new();
@@ -24,7 +19,7 @@ namespace SampleProject.Endpoints;
 //        return Results.Ok(products);
 //    }
 
-//    [EndpointMethod(RouteType = RouteType.DELETE, AuthenticationRequired = AuthenticationRequired.Yes)]
+//    [EndpointMethodAttribute(RouteType = RouteType.DELETE, AuthenticationRequired = AuthenticationRequired.Yes)]
 //    public IResult DeleteProduct(MemoryCache cache, int id)
 //    {
 //        var products = cache.Get<List<Product>>(_cacheKey) ?? new();
@@ -40,7 +35,7 @@ namespace SampleProject.Endpoints;
 //        return Results.Ok();
 //    }
 
-//    [EndpointMethod]
+//    [EndpointMethodAttribute]
 //    public async Task<IResult> AddProduct(MemoryCache cache, IHubContext<ChatHub> hubContext, string name)
 //    {
 //        var products = cache.Get<List<Product>>(_cacheKey);

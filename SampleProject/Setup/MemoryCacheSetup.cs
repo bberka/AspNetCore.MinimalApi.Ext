@@ -1,15 +1,13 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Selfrated.MinimalAPI.Middleware;
+﻿using AspNetCore.MinimalApi.Ext.Middleware;
+using Microsoft.Extensions.Caching.Memory;
 
-namespace SampleProject.Setup;
+namespace AspNetCore.MinimalApi.Ext.Sample.Setup;
 
 public class MemoryCacheSetup : IBuilderServiceSetup
 {
-    public void InitializeServices(IServiceCollection services, ConfigurationManager configuration, ConfigureHostBuilder host)
-    {
-        services.AddSingleton(e => new MemoryCache(
-        new MemoryCacheOptions
-        {
-        }));
-    }
+  public void InitializeServices(IServiceCollection services, ConfigurationManager configuration,
+    ConfigureHostBuilder host) {
+    services.AddSingleton(e => new MemoryCache(
+      new MemoryCacheOptions()));
+  }
 }

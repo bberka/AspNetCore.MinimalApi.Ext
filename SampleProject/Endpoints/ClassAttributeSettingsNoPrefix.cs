@@ -1,20 +1,8 @@
-﻿using Selfrated.MinimalAPI.Middleware.Attributes;
+﻿namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints;
 
-namespace SampleProject.Endpoints;
-
-//[EndpointAPI(Name = null)]
-//public class ClassAttributeSettingsNoPrefixEndpoint
-//{
-//    [EndpointMethod]
-//    public string HelloWorld()
-//    {
-//        return "Hello World!";
-//    }
-
-//    [EndpointMethod(RouteType = RouteType.POST)]
-//    public string HelloWorldOverrideRouteType()
-//    {
-//        return "Hello World!";
-//    }
-
-//}
+public class BasicEndpointExample : BaseEndpointSync.WithoutRequest.WithResult<string>
+{
+  public override string Handle(HttpContext context) {
+    return "Hello World!";
+  }
+}

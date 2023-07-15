@@ -4,7 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>Selfrated.Middleware</RootNamespace>
+    <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>Minimal API Middleware and Attributes</Title>
     <Description>Middleware and Attributes to simplify Minimal API Development</Description>
@@ -12,7 +12,7 @@
     <RepositoryUrl>https://github.com/edelyn/Selfrated.MinimalAPI.Middleware</RepositoryUrl>
     <PackageTags>MinimalAPI;Middleware;Endpoints;ASPNetCore</PackageTags>
     <Authors>Edward Elyn</Authors>
-	  <Version>1.0.7</Version>
+	  <Version>2.0.0-beta</Version>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
@@ -23,9 +23,6 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>

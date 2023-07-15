@@ -1,20 +1,12 @@
-﻿using Selfrated.MinimalAPI.Middleware.Attributes;
+﻿using Microsoft.AspNetCore.Mvc;
 
-namespace SampleProject.Endpoints;
+namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints;
 
-//[EndpointAPI(Name = "NameOverride", RouteType = RouteType.GET)]
-//public class ClassAttributeSettings
-//{
-//    [EndpointMethod]
-//    public string HelloWorld()
-//    {
-//        return "Hello World!";
-//    }
-
-//    [EndpointMethod(RouteType = RouteType.POST)]
-//    public string HelloWorldOverrideRouteType()
-//    {
-//        return "Hello World!";
-//    }
-
-//}
+[Route("NameOverride")]
+public class ClassAttributeSettings : BaseEndpointSync.WithoutRequest.WithResult<string>
+{
+  [HttpPost]
+  public override string Handle(HttpContext context) {
+    return "Hello World!";
+  }
+}

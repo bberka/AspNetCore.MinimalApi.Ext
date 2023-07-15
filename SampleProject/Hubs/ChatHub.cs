@@ -1,67 +1,55 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace SampleProject.Hubs;
+namespace AspNetCore.MinimalApi.Ext.Sample.Hubs;
 
 public class ChatHub : Hub
 {
-    private class User
-    {
-        public string ConnectionId { get; set; }
-        public string Name { get; set; }
+  //list of user connections
+  private static readonly List<User> Users = new();
+
+  //lock
+  private static readonly object _lock = new();
+
+  //disconnect, remove user from list
+  public override async Task OnDisconnectedAsync(Exception exception) {
+    lock (_lock) {
+      var users = Users.Where(u => u.ConnectionId == Context.ConnectionId).ToList();
+
+      foreach (var user in users)
+        if (user != null)
+          Users.Remove(user);
     }
 
-    //list of user connections
-    private static readonly List<User> Users = new();
+    await Clients.All.SendAsync("UsersUpdated", Users);
 
-    //lock
-    private static object _lock = new object();
+    await base.OnDisconnectedAsync(exception);
+  }
 
-    //disconnect, remove user from list
-    public override async Task OnDisconnectedAsync(Exception exception)
-    {
-        lock (_lock)
-        {
-            var users = Users.Where(u => u.ConnectionId == Context.ConnectionId).ToList();
+  //connect, add user to list
+  public async Task OnConnect() {
+    await Clients.Caller.SendAsync("UsersUpdated", Users);
+  }
 
-            foreach (var user in users)
-            {
-                if (user != null)
-                {
-                    Users.Remove(user);
-                }
-            }
-        }
+  public async Task AddUser(string userName) {
+    var user = new User {
+      ConnectionId = Context.ConnectionId
+    };
 
-        await Clients.All.SendAsync("UsersUpdated", Users);
-
-        await base.OnDisconnectedAsync(exception);
+    lock (_lock) {
+      Users.Add(user);
     }
 
-    //connect, add user to list
-    public async Task OnConnect()
-    {
-        await Clients.Caller.SendAsync("UsersUpdated", Users);
-    }
+    await Clients.All.SendAsync("UsersUpdated", Users);
+  }
 
-    public async Task AddUser(string userName)
-    {
-        var user = new User
-        {
-            ConnectionId = Context.ConnectionId
-        };
+  //send message to all users
+  public async Task SendMessage(string message, string userName) {
+    await Clients.All.SendAsync("ReceiveMessage", message, userName);
+  }
 
-        lock (_lock)
-        {
-            Users.Add(user);
-        }
-
-        await Clients.All.SendAsync("UsersUpdated", Users);
-
-    }
-
-    //send message to all users
-    public async Task SendMessage(string message, string userName)
-    {
-        await Clients.All.SendAsync("ReceiveMessage", message, userName);
-    }
+  private class User
+  {
+    public string ConnectionId { get; set; }
+    public string Name { get; set; }
+  }
 }
