@@ -7,6 +7,6 @@ public class EndpointRouteAttribute : Attribute
     Template = template;
   }
 
-  public string Template { get; private set; }
+  public string Template { get; }
   public string? Name { get; set; }
 }

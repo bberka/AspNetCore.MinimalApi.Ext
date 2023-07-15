@@ -3,10 +3,6 @@ using System.Reflection;
 using System.Text;
 using AspNetCore.MinimalApi.Ext.Attributes;
 using AspNetCore.MinimalApi.Ext.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace AspNetCore.MinimalApi.Ext;
 

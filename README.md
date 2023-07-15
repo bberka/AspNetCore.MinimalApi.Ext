@@ -4,15 +4,20 @@ A set of tools to simplify creating ASPNetCore applications, specifically when u
 
 The middleware helps clean up your code by making it easy to break the application startup into seperate classes, ideally named by what their purpose is. 
 
+## Why forked ?
+- Code is cleaned up and simplified.
+- Added support for custom attributes.
+- Seperated attributes as a better design choice.
+- Better namings
+- Forced single endpoint per class.
 
-### Reqiurements
-and ASPNetCore applications, with at least .NET 7.0
+## Reqiurements
 
-### Installation Instructions
+ASPNetCore applications, with at least .NET 7.0
 
-```shell
-dotnet add package Selfrated.MinimalAPI.Middleware
-```
+## Installation Instructions
+
+This is a fork from original project there is no package yet. You can only install it from github.
 
 ## Endpoint Attributes
 By utilizing these attributes, you can quickly and easily get endpoints created from any file that uses them. By default the names of the classes/methods will be the names of the endpoints, requiring as little code/effort as possible.
@@ -24,47 +29,60 @@ using Selfrated.MinimalAPI.Middleware.Attributes;
 
 namespace WebApplication1.Endpoints;
 
-[EndpointAPI]
-public class Sample
+
+public class Sample : BaseEndpoint
 {
-    [EndpointMethod]
-    public string TestEndpoint()
+    public string Handle(HttpContext context)
     {
         return "Hello World!";
-    }
+    }   
 }
 ```
+Every class that has BaseEndpoint as a parent will automatically be processed for creating endpoints. 
+Only Handle method will be considered as an endpoint.
 
-### EndpointAPIAttribute
-Any class that has wants to expose an endpoint will need to have this attribute defined. 
+Library forces you to have single endpoint per class. 
+You can create multiple classes in a single file but not 2 or more endpoints in a single class.
+### EndpointAuthorizeAttribute
+By using this on class, it will require authorization to access the endpoint.
 
-#### Optional Parameters
-* Name - set this if you don't want to use the class name. Setting as null will exlude the path prefix (i.e. /Sample/TestEndpoint will become /TestEndpoint)
-* AuthenticationRequired - Default No. This will apply to all child methods, unless explicitly stated by the method
-* Roles - Array of role names required for authorization.
-* RouteType - Default Post. Can combine using bitwise OR operator (i.e RouteType.Post | RouteType.Get)
-* EndpointFilters - Types that implements IEndpointFilter.
+### EndpointFilterAttribute
+By using this on class, you can use custom filters that assigned from IEndpointFilter 
 
-#### Sample with override
+### EndpointRouteAttribute
+By using this on class, you can override the route of the endpoint. 
+
+### EndpointHttpMethodAttribute
+By using this on class, you can override the http method of the endpoint. 
+You can use multiple and if you use none it will be GET by default.
+
+
+### Why not using default attributes ?
+Currently default attributes provided by AspNetCore is not supported but support can be added easily.
+
+Custom attributes provided by the library currently only way to go and can only be used on the class not method.
+
+### EndpointMiddlewareOptions
+You can use EndpointMiddlewareOptions to configure the middleware.
+
 ```csharp
-[EndpointAPI(Name = "NewPrefix", AuthenticationRequired = AuthenticationRequired.Yes)]
+app.UseMinimalApiEndpoints(x => { 
+  x.GlobalPrefix = "api"; //Url: /api/Product/Get etc.
+
+  //Global filters
+  x.EndpointFilters = new List<Type> { typeof(CustomFilter) };
+
+  //Global authorization
+  x.AuthorizeData = new AuthorizeData(){
+    Policy = "PolicyName"
+  };
+});
 ```
 
-### EndpointMethodAttribute
-By using this on any method in a class that uses EndpointAPIAttribute, it will create an endpoint just like that!
-
-#### Optional Parameters
-* Name - set this if you don't want to use the class name.
-* AuthenticationRequired - Default Inherit.
-* Roles - Array of role names required for authorization.
-* RouteType - Default Inherit. Can combine using bitwise OR operator (i.e RouteType.Post | RouteType.Get)
-* UrlPrefixOverride - Override the url prefix from the parent.
-* EndpointFilter - Default Inherit. Type that implements IEndpointFilter.
-
-#### Sample with parameters
-```csharp
-[EndpointMethod(Name = "NewName", RouteType = RouteType.POST | RouteType.PUT)]
-```
+### What is not supported ?
+- Currently only class level custom attributes are supported.
+- Model binding to query is not supported however you can use FromQueryAttribute to bind to query.
+- IActionFilters etc. are not supported.
 
 ## IBuilderServiceSetup and IApplicationSetup
 
@@ -110,7 +128,7 @@ This is a complete Program.cs file!
     app.UseApplicationSetup();
 
     //if using EndpointAttributes (Minimal API)
-    app.UseEndpointsAPIAttributes();
+    app.UseMinimalApiEndpoints();
 
     app.Run();
 ```

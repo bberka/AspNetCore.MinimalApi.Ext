@@ -8,9 +8,7 @@ public class DeleteProduct : BaseEndpointSync.WithRequest<int>.WithResult<bool>
     var cache = context.RequestServices.GetRequiredService<MemoryCache>();
     var products = cache.Get<List<Classes.Product>>("Products") ?? new List<Classes.Product>();
     var product = products.FirstOrDefault(p => p.Id == request);
-    if (product == null) {
-      return false;
-    }
+    if (product == null) return false;
     products.Remove(product);
     cache.Set("Products", products);
     return true;

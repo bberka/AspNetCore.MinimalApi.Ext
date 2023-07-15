@@ -1,7 +1,6 @@
 ﻿using AspNetCore.MinimalApi.Ext.Attributes;
 using AspNetCore.MinimalApi.Ext.Enums;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints.Product;

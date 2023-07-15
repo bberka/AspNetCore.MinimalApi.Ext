@@ -12,7 +12,7 @@
     <RepositoryUrl>https://github.com/edelyn/Selfrated.MinimalAPI.Middleware</RepositoryUrl>
     <PackageTags>MinimalAPI;Middleware;Endpoints;ASPNetCore</PackageTags>
     <Authors>Edward Elyn</Authors>
-	  <Version>2.2.0-beta</Version>
+	  <Version>2.0.0-preview</Version>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>

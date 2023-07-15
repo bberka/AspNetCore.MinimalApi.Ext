@@ -12,7 +12,6 @@ public class EndpointWithManyRequestValues : BaseEndpoint
 public class EndpointWithManyRequestValues2 : BaseEndpointSync.WithManyRequest<int,string>.WithResult<string>
 {
  
-
   public override string Handle(HttpContext context, int id, string name) {
     return "Id: " + id + " Name:" + name;
   }

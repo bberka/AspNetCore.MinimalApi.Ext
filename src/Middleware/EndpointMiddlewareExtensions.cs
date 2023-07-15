@@ -8,17 +8,17 @@ namespace AspNetCore.MinimalApi.Ext.Middleware;
 
 public static class EndpointMiddlewareExtensions
 {
-  public static void UseEndpointsApi(this WebApplication app, Action<EndpointMiddlewareOptions> action) {
+  public static void UseMinimalApiEndpoints(this WebApplication app, Action<EndpointMiddlewareOptions> action) {
     var options = new EndpointMiddlewareOptions();
     action(options);
     UseEndpoints(app, options);
   }
 
-  public static void UseEndpointsApi(this WebApplication app, EndpointMiddlewareOptions options) {
+  public static void UseMinimalApiEndpoints(this WebApplication app, EndpointMiddlewareOptions options) {
     UseEndpoints(app, options);
   }
 
-  public static void UseEndpointsApi(this WebApplication app) {
+  public static void UseMinimalApiEndpoints(this WebApplication app) {
     var options = new EndpointMiddlewareOptions();
     UseEndpoints(app, options);
   }
