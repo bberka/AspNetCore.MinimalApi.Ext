@@ -40,7 +40,8 @@ public static class EndpointMiddlewareExtensions
       foreach (var methodResult in methods) {
         var methodDelegate = methodResult.Method.CreateDelegate(methodResult.Method.GetDelegateType(), classInstance);
 
-        var path = InternalUtils.GetUrlPath(options, classResult.Route, classResult.Type.Name, classResult.Type.GetContainingFolderName(), mainName);
+        var path = InternalUtils.GetUrlPath(options, classResult.Route, classResult.Type.Name,
+          classResult.Type.GetContainingFolderName(), mainName);
 
         var globalFilters = options.EndpointFilters;
 
