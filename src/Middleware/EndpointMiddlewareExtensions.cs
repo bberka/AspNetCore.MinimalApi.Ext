@@ -8,48 +8,40 @@ namespace AspNetCore.MinimalApi.Ext.Middleware;
 
 public static class EndpointMiddlewareExtensions
 {
-  public static void UseEndpointsAPIAttributes(this WebApplication app, Action<EndpointMiddlewareOptions> action) {
+  public static void UseEndpointsApi(this WebApplication app, Action<EndpointMiddlewareOptions> action) {
     var options = new EndpointMiddlewareOptions();
     action(options);
     UseEndpoints(app, options);
   }
 
-  public static void UseEndpointsAPIAttributes(this WebApplication app, EndpointMiddlewareOptions options) {
+  public static void UseEndpointsApi(this WebApplication app, EndpointMiddlewareOptions options) {
     UseEndpoints(app, options);
   }
 
-  public static void UseEndpointsAPIAttributes(this WebApplication app) {
+  public static void UseEndpointsApi(this WebApplication app) {
     var options = new EndpointMiddlewareOptions();
     UseEndpoints(app, options);
   }
 
   private static void UseEndpoints(this WebApplication app, EndpointMiddlewareOptions options) {
-    //get all assemblies that have the ApiEndpointAttribute attribute
     var entryAssembly = Assembly.GetEntryAssembly();
     var mainName = entryAssembly?.GetName().Name ?? throw new ArgumentNullException(nameof(entryAssembly));
     var results = entryAssembly.GetExportedTypeResults();
     if (results.Count == 0) return;
 
     foreach (var classResult in results) {
-      //instantiate the class
       var classInstance = Activator.CreateInstance(classResult.Type);
 
       if (classInstance == null)
         continue;
 
-      //get methods that have the EndpointMethodAttribute
       var methods = classResult.Type.GetEndpointHandlerMethods();
 
-      foreach (var method in methods) {
-        var methodDelegate = method.Method.CreateDelegate(
-          method.Method.GetDelegateType(),
-          classInstance);
+      foreach (var methodResult in methods) {
+        var methodDelegate = methodResult.Method.CreateDelegate(methodResult.Method.GetDelegateType(), classInstance);
 
-        var path = InternalUtils.GetUrlPath(options, classResult.Route, classResult.Type.Name,
-          classResult.Type.GetContainingFolderName(), mainName);
+        var path = InternalUtils.GetUrlPath(options, classResult.Route, classResult.Type.Name, classResult.Type.GetContainingFolderName(), mainName);
 
-        //var authData = options.GetAuthorizeData(classResult.Type, method.Method);
-        //var filters = options.GetHttpFiltersByType(classResult.Type, method.Method);
         var globalFilters = options.EndpointFilters;
 
         foreach (var httpMethod in classResult.HttpMethods) {
@@ -62,7 +54,6 @@ public static class EndpointMiddlewareExtensions
             _ => throw new ArgumentOutOfRangeException(nameof(httpMethod))
           };
 
-          if (call == null) continue;
           if (options.AuthorizeData is not null) call.RequireAuthorization(options.AuthorizeData);
 
           if (classResult.Authorize is not null) call.RequireAuthorization(classResult.Authorize);

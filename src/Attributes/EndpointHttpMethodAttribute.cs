@@ -3,13 +3,13 @@
 namespace AspNetCore.MinimalApi.Ext.Attributes;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class EndpointMethodAttribute : Attribute
+public class EndpointHttpMethodAttribute : Attribute
 {
-  public EndpointMethodAttribute(HttpMethodTypes httpMethodTypes) {
+  public EndpointHttpMethodAttribute(HttpMethodTypes httpMethodTypes) {
     HttpMethods = new[] { httpMethodTypes };
   }
 
-  public EndpointMethodAttribute(params HttpMethodTypes[] httpMethod) {
+  public EndpointHttpMethodAttribute(params HttpMethodTypes[] httpMethod) {
     HttpMethods = httpMethod;
   }
 

@@ -65,52 +65,11 @@ internal static class InternalUtils
     return delegateType;
   }
 
-  internal static Type[]
-    GetHttpFiltersByType(this EndpointMiddlewareOptions options, Type classType, MethodInfo method) {
-    var methodAttributes = method.CustomAttributes;
-
-    var filterTypes = methodAttributes
-      .Select(attributeData => attributeData.AttributeType)
-      .Where(attributeType => typeof(Attribute).IsAssignableFrom(attributeType) &&
-                              typeof(IEndpointFilter).IsAssignableFrom(attributeType))
-      .ToList();
-
-    var classAttributes = classType.CustomAttributes;
-
-    filterTypes.AddRange(classAttributes
-      .Select(attributeData => attributeData.AttributeType)
-      .Where(attributeType => typeof(Attribute).IsAssignableFrom(attributeType) &&
-                              typeof(IEndpointFilter).IsAssignableFrom(attributeType)));
-
-    return filterTypes.ToArray() ?? Array.Empty<Type>();
-  }
-
-  internal static string[] GetHttpMethodTypes(this MethodInfo method) {
-    var methods = method.CustomAttributes
-      .Where(x => x.AttributeType.BaseType == typeof(HttpMethodAttribute))
-      .Select(x => GetHttpMethodStringFromAttributeName(x.AttributeType))
-      .ToArray();
-    return methods.Length == 0 ? new[] { "GET" } : methods;
-
-    static string GetHttpMethodStringFromAttributeName(Type? type) {
-      if (typeof(HttpGetAttribute) == type) return "GET";
-      if (typeof(HttpPostAttribute) == type) return "POST";
-      if (typeof(HttpPutAttribute) == type) return "PUT";
-      if (typeof(HttpDeleteAttribute) == type) return "DELETE";
-      return "GET";
-    }
-  }
 
   internal static string GetContainingFolderName(this Type type) {
     var name = type.Namespace;
     var split = name?.Split('.');
     return split?[^1] ?? "";
-  }
-
-  internal static IAuthorizeData? GetAuthorizeData(this EndpointMiddlewareOptions options, Type classType,
-    MethodInfo methodType) {
-    return methodType.GetCustomAttributes<AuthorizeAttribute>().FirstOrDefault()
-           ?? classType.GetCustomAttributes<AuthorizeAttribute>().FirstOrDefault();
   }
 
   internal static List<ExportedClassTypeResult> GetExportedTypeResults(this Assembly entryAssembly) {

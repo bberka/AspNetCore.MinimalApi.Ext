@@ -12,7 +12,7 @@ internal class ExportedClassTypeResult
     Route = type.GetCustomAttribute<EndpointRouteAttribute>();
     Authorize = type.GetCustomAttribute<EndpointAuthorizeAttribute>();
     Filters = type.GetCustomAttributes<EndpointFilterAttribute>().Select(x => x.Type).ToArray() ?? Array.Empty<Type>();
-    HttpMethods = type.GetCustomAttribute<EndpointMethodAttribute>()?.HttpMethods ?? new[] { HttpMethodTypes.GET };
+    HttpMethods = type.GetCustomAttribute<EndpointHttpMethodAttribute>()?.HttpMethods ?? new[] { HttpMethodTypes.GET };
   }
 
   public Type Type { get; set; }
