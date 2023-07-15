@@ -83,7 +83,7 @@ app.UseMinimalApiEndpoints(x => {
 - Currently only class level custom attributes are supported.
 - Model binding to query is not supported however you can use FromQueryAttribute to bind to query.
 - IActionFilters etc. are not supported.
-
+- Swagger generation with folders as controllers
 ## IBuilderServiceSetup and IApplicationSetup
 
 Any objects that implement IBuilderServiceSetup and/or IApplicationSetup will be processed when the WebApplication is built. This happens once, when the applcation starts.
