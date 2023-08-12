@@ -8,7 +8,8 @@ namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints.Product;
 [EndpointHttpMethod(HttpMethodTypes.POST)]
 public class Add : BaseEndpointSync.WithRequest<Classes.Product>.WithResult<bool>
 {
-  public override bool Handle(HttpContext context, [FromBody] Classes.Product product) {
+  public override bool Handle(HttpContext context, [FromBody] Classes.Product product)
+  {
     var cache = context.RequestServices.GetRequiredService<MemoryCache>();
     var products = cache.Get<List<Classes.Product>>("Products") ?? new List<Classes.Product>();
     products.Add(product);

@@ -2,7 +2,8 @@
 
 public class BasicEndpointExample : BaseEndpointSync.WithoutRequest.WithResult<string>
 {
-  public override string Handle(HttpContext context) {
+  public override string Handle(HttpContext context)
+  {
     return "Hello World!";
   }
 }

@@ -1,7 +1,7 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 
-namespace AspNetCore.MinimalApi.Ext.Middleware;
+namespace AspNetCore.MinimalApi.Ext.Setup;
 
 public static class SetupApplicationMiddlewareExtensions
 {
@@ -9,10 +9,13 @@ public static class SetupApplicationMiddlewareExtensions
   ///   This will enable any classes implementing IApplicationSetup
   /// </summary>
   /// <param name="app"></param>
-  public static void UseApplicationSetup(this WebApplication app) {
-    var results = Assembly.GetCallingAssembly().ExportedTypes
+  public static void UseApplicationSetup(this WebApplication app)
+  {
+    var results = Assembly.GetCallingAssembly()
+      .ExportedTypes
       .Where(x => typeof(IApplicationSetup).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-      .Select(Activator.CreateInstance).Cast<IApplicationSetup>();
+      .Select(Activator.CreateInstance)
+      .Cast<IApplicationSetup>();
 
     foreach (var result in results) result.InitializeApplication(app);
   }

@@ -1,6 +1,6 @@
 ﻿namespace AspNetCore.MinimalApi.Ext.Enums;
 
-public enum HttpMethodTypes
+public enum HttpMethodTypes : byte
 {
   GET,
   POST,

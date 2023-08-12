@@ -5,13 +5,14 @@ namespace AspNetCore.MinimalApi.Ext.Sample.Hubs;
 public class ChatHub : Hub
 {
   //list of user connections
-  private static readonly List<User> Users = new();
+  private readonly static List<User> Users = new();
 
   //lock
-  private static readonly object _lock = new();
+  private readonly static object _lock = new();
 
   //disconnect, remove user from list
-  public override async Task OnDisconnectedAsync(Exception exception) {
+  public override async Task OnDisconnectedAsync(Exception exception)
+  {
     lock (_lock) {
       var users = Users.Where(u => u.ConnectionId == Context.ConnectionId).ToList();
 
@@ -26,12 +27,15 @@ public class ChatHub : Hub
   }
 
   //connect, add user to list
-  public async Task OnConnect() {
+  public async Task OnConnect()
+  {
     await Clients.Caller.SendAsync("UsersUpdated", Users);
   }
 
-  public async Task AddUser(string userName) {
-    var user = new User {
+  public async Task AddUser(string userName)
+  {
+    var user = new User
+    {
       ConnectionId = Context.ConnectionId
     };
 
@@ -43,7 +47,8 @@ public class ChatHub : Hub
   }
 
   //send message to all users
-  public async Task SendMessage(string message, string userName) {
+  public async Task SendMessage(string message, string userName)
+  {
     await Clients.All.SendAsync("ReceiveMessage", message, userName);
   }
 

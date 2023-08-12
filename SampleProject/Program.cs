@@ -1,4 +1,4 @@
-using AspNetCore.MinimalApi.Ext.Middleware;
+using AspNetCore.MinimalApi.Ext.Setup;
 
 var builder = WebApplication.CreateBuilder(args);
 

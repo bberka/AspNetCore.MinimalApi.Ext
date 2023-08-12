@@ -1,6 +1,6 @@
 ﻿namespace AspNetCore.MinimalApi.Ext;
 
-public class EndpointMiddlewareOptions
+public sealed class EndpointOptions
 {
   //public bool AuthenticationRequired { get; set; } = false;
   public AuthorizeData? AuthorizeData { get; set; } = null;

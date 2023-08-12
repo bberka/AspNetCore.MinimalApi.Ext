@@ -1,12 +1,13 @@
-﻿using AspNetCore.MinimalApi.Ext.Middleware;
-using AspNetCore.MinimalApi.Ext.Sample.Classes;
+﻿using AspNetCore.MinimalApi.Ext.Sample.Classes;
+using AspNetCore.MinimalApi.Ext.Setup;
 using Microsoft.OpenApi.Models;
 
 namespace AspNetCore.MinimalApi.Ext.Sample.Setup;
 
 public class SwaggerSetup : IBuilderServiceSetup, IApplicationSetup
 {
-  public void InitializeApplication(WebApplication app) {
+  public void InitializeApplication(WebApplication app)
+  {
     var swaggerSettings =
       app.Configuration.GetSection("SwaggerSettings").Get<SwaggerSettings>() ?? new SwaggerSettings();
 
@@ -27,7 +28,8 @@ public class SwaggerSetup : IBuilderServiceSetup, IApplicationSetup
   }
 
   public void InitializeServices(IServiceCollection services, ConfigurationManager configuration,
-    ConfigureHostBuilder host) {
+    ConfigureHostBuilder host)
+  {
     var swaggerSettings = configuration.GetSection("SwaggerSettings").Get<SwaggerSettings>() ?? new SwaggerSettings();
 
     if (swaggerSettings != null) {
@@ -36,16 +38,20 @@ public class SwaggerSetup : IBuilderServiceSetup, IApplicationSetup
       services.AddEndpointsApiExplorer();
 
       services.AddSwaggerGen(c => {
-        c.SwaggerDoc(swaggerSettings.Version, new OpenApiInfo {
+        c.SwaggerDoc(swaggerSettings.Version, new OpenApiInfo
+        {
           Title = swaggerSettings.ApplicationName,
           Version = swaggerSettings.Version
         });
 
         if (azureAd != null) {
-          c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+          c.AddSecurityRequirement(new OpenApiSecurityRequirement
+          {
             {
-              new OpenApiSecurityScheme {
-                Reference = new OpenApiReference {
+              new OpenApiSecurityScheme
+              {
+                Reference = new OpenApiReference
+                {
                   Type = ReferenceType.SecurityScheme,
                   Id = "oauth2"
                 },
@@ -57,14 +63,18 @@ public class SwaggerSetup : IBuilderServiceSetup, IApplicationSetup
             }
           });
 
-          c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme {
+          c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+          {
             Type = SecuritySchemeType.OAuth2,
-            Flows = new OpenApiOAuthFlows {
-              AuthorizationCode = new OpenApiOAuthFlow {
+            Flows = new OpenApiOAuthFlows
+            {
+              AuthorizationCode = new OpenApiOAuthFlow
+              {
                 AuthorizationUrl =
                   new Uri($"https://login.microsoftonline.com/{azureAd.TenantId}/oauth2/v2.0/authorize"),
                 TokenUrl = new Uri($"https://login.microsoftonline.com/{azureAd.TenantId}/oauth2/v2.0/token"),
-                Scopes = new Dictionary<string, string> {
+                Scopes = new Dictionary<string, string>
+                {
                   {
                     azureAd.Scope,
                     "https://graph.microsoft.com/v1.0/me"

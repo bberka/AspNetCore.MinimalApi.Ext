@@ -2,17 +2,28 @@
 using AspNetCore.MinimalApi.Ext.Attributes;
 using AspNetCore.MinimalApi.Ext.Enums;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AspNetCore.MinimalApi.Ext.Models;
 
-internal class ExportedClassTypeResult
+internal sealed class ExportedClassTypeResult
 {
-  public ExportedClassTypeResult(Type type) {
+  public ExportedClassTypeResult(Type type)
+  {
     Type = type;
     Route = type.GetCustomAttribute<EndpointRouteAttribute>();
-    Authorize = type.GetCustomAttribute<EndpointAuthorizeAttribute>();
-    Filters = type.GetCustomAttributes<EndpointFilterAttribute>().Select(x => x.Type).ToArray() ?? Array.Empty<Type>();
-    HttpMethods = type.GetCustomAttribute<EndpointHttpMethodAttribute>()?.HttpMethods ?? new[] { HttpMethodTypes.GET };
+    if (Route is null) {
+      var routeAttributes = type.GetCustomAttributes<RouteAttribute>();
+      var routeAttribute = routeAttributes.FirstOrDefault();
+      if (routeAttribute is not null) Route = new EndpointRouteAttribute(routeAttribute);
+    }
+
+    Authorize = type.GetCustomAttribute<AuthorizeAttribute>();
+    var allowAnonymous = type.GetCustomAttribute<AllowAnonymousAttribute>();
+    if (allowAnonymous is not null) Authorize = null;
+
+    Filters = type.GetCustomAttributes<EndpointFilterAttribute>().Select(x => x.Type).ToArray();
+    HttpMethods = type.GetHttpMethods();
   }
 
   public Type Type { get; set; }

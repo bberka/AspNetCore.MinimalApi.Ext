@@ -5,10 +5,10 @@
 /// </summary>
 public class SampleEndpointFilter : IEndpointFilter
 {
-  public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next) {
+  public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+  {
     var idFromQuery = context.HttpContext.Request.Query["id"].FirstOrDefault();
     if (idFromQuery != "1234") context.HttpContext.Response.StatusCode = 401;
     return await next(context);
   }
 }
-

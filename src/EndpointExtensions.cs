@@ -4,26 +4,30 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AspNetCore.MinimalApi.Ext.Middleware;
+namespace AspNetCore.MinimalApi.Ext;
 
-public static class EndpointMiddlewareExtensions
+public static class EndpointExtensions
 {
-  public static void UseMinimalApiEndpoints(this WebApplication app, Action<EndpointMiddlewareOptions> action) {
-    var options = new EndpointMiddlewareOptions();
+  public static void UseMinimalApiEndpoints(this WebApplication app, Action<EndpointOptions> action)
+  {
+    var options = new EndpointOptions();
     action(options);
-    UseEndpoints(app, options);
+    InternalUseEndpoints(app, options);
   }
 
-  public static void UseMinimalApiEndpoints(this WebApplication app, EndpointMiddlewareOptions options) {
-    UseEndpoints(app, options);
+  public static void UseMinimalApiEndpoints(this WebApplication app, EndpointOptions options)
+  {
+    InternalUseEndpoints(app, options);
   }
 
-  public static void UseMinimalApiEndpoints(this WebApplication app) {
-    var options = new EndpointMiddlewareOptions();
-    UseEndpoints(app, options);
+  public static void UseMinimalApiEndpoints(this WebApplication app)
+  {
+    var options = new EndpointOptions();
+    InternalUseEndpoints(app, options);
   }
 
-  private static void UseEndpoints(this WebApplication app, EndpointMiddlewareOptions options) {
+  private static void InternalUseEndpoints(this WebApplication app, EndpointOptions options)
+  {
     var entryAssembly = Assembly.GetEntryAssembly();
     var mainName = entryAssembly?.GetName().Name ?? throw new ArgumentNullException(nameof(entryAssembly));
     var results = entryAssembly.GetExportedTypeResults();
@@ -46,7 +50,8 @@ public static class EndpointMiddlewareExtensions
         var globalFilters = options.EndpointFilters;
 
         foreach (var httpMethod in classResult.HttpMethods) {
-          var call = httpMethod switch {
+          var call = httpMethod switch
+          {
             HttpMethodTypes.POST => app.MapPost(path, methodDelegate),
             HttpMethodTypes.GET => app.MapGet(path, methodDelegate),
             HttpMethodTypes.PUT => app.MapPut(path, methodDelegate),
@@ -59,11 +64,10 @@ public static class EndpointMiddlewareExtensions
 
           if (classResult.Authorize is not null) call.RequireAuthorization(classResult.Authorize);
 
-          foreach (var filterItem in classResult.Filters)
+          foreach (var filterItem in globalFilters)
             if (ActivatorUtilities.CreateInstance(app.Services, filterItem) is IEndpointFilter filter)
               call.AddEndpointFilter(filter);
-
-          foreach (var filterItem in globalFilters)
+          foreach (var filterItem in classResult.Filters)
             if (ActivatorUtilities.CreateInstance(app.Services, filterItem) is IEndpointFilter filter)
               call.AddEndpointFilter(filter);
         }
@@ -71,5 +75,3 @@ public static class EndpointMiddlewareExtensions
     }
   }
 }
-
-

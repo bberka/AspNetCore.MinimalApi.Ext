@@ -1,5 +1,5 @@
-﻿using AspNetCore.MinimalApi.Ext.Middleware;
-using AspNetCore.MinimalApi.Ext.Sample.Classes;
+﻿using AspNetCore.MinimalApi.Ext.Sample.Classes;
+using AspNetCore.MinimalApi.Ext.Setup;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 
@@ -7,7 +7,8 @@ namespace AspNetCore.MinimalApi.Ext.Sample.Setup;
 
 public class AzureADAuthenticationSetup : IApplicationSetup, IBuilderServiceSetup
 {
-  public void InitializeApplication(WebApplication app) {
+  public void InitializeApplication(WebApplication app)
+  {
     var azureAd = app.Configuration.GetSection("AzureAd").Get<AzureAd>();
 
     if (azureAd != null) {
@@ -17,7 +18,8 @@ public class AzureADAuthenticationSetup : IApplicationSetup, IBuilderServiceSetu
   }
 
   public void InitializeServices(IServiceCollection services, ConfigurationManager configuration,
-    ConfigureHostBuilder host) {
+    ConfigureHostBuilder host)
+  {
     var azureAd = configuration.GetSection("AzureAd").Get<AzureAd>();
 
     if (azureAd != null)

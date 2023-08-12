@@ -2,9 +2,10 @@
 
 namespace AspNetCore.MinimalApi.Ext.Models;
 
-internal class ExportedMethodResult
+internal sealed class ExportedMethodResult
 {
-  public ExportedMethodResult(MethodInfo method) {
+  public ExportedMethodResult(MethodInfo method)
+  {
     Method = method;
   }
 

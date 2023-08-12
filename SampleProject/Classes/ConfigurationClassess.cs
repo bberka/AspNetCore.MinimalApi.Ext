@@ -2,13 +2,13 @@
 
 public class AppSettings
 {
-  public List<string> CORSAllowedURLS { get; set; } = new();
+  public List<string> CorsAllowedUrls { get; set; } = new();
 }
 
 public class SwaggerSettings
 {
-  public string ApplicationName { get; set; }
-  public string Version { get; set; }
+  public string ApplicationName { get; set; } = string.Empty;
+  public string Version { get; set; } = string.Empty;
 }
 
 public class AzureAd

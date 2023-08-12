@@ -1,11 +1,12 @@
-﻿using AspNetCore.MinimalApi.Ext.Middleware;
-using AspNetCore.MinimalApi.Ext.Sample.Hubs;
+﻿using AspNetCore.MinimalApi.Ext.Sample.Hubs;
+using AspNetCore.MinimalApi.Ext.Setup;
 
 namespace AspNetCore.MinimalApi.Ext.Sample.Setup;
 
 public class SignalRSetup : IApplicationSetup, IBuilderServiceSetup
 {
-  public void InitializeApplication(WebApplication app) {
+  public void InitializeApplication(WebApplication app)
+  {
     app.UseDefaultFiles();
     app.UseStaticFiles();
 
@@ -13,7 +14,8 @@ public class SignalRSetup : IApplicationSetup, IBuilderServiceSetup
   }
 
   public void InitializeServices(IServiceCollection services, ConfigurationManager configuration,
-    ConfigureHostBuilder host) {
+    ConfigureHostBuilder host)
+  {
     services.AddSignalR();
   }
 }
