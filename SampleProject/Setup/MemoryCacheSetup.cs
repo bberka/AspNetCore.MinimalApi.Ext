@@ -5,10 +5,9 @@ namespace AspNetCore.MinimalApi.Ext.Sample.Setup;
 
 public class MemoryCacheSetup : IBuilderServiceSetup
 {
-  public void InitializeServices(IServiceCollection services, ConfigurationManager configuration,
-    ConfigureHostBuilder host)
+  public void InitializeServices(WebApplicationBuilder builder)
   {
-    services.AddSingleton(e => new MemoryCache(
+    builder.Services.AddSingleton(e => new MemoryCache(
       new MemoryCacheOptions()));
   }
 }

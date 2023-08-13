@@ -19,15 +19,7 @@ public static class SetupBuilderMiddlewareExtensions
       .Select(Activator.CreateInstance)
       .Cast<IBuilderServiceSetup>();
 
-    foreach (var result in results) result.InitializeServices(builder.Services, builder.Configuration, builder.Host);
+    foreach (var result in results) result.InitializeServices(builder);
   }
 }
 
-public interface IBuilderServiceSetup
-{
-  /// <summary>
-  ///   This is where you can add any service setup
-  /// </summary>
-  /// <param name="services"></param>
-  void InitializeServices(IServiceCollection services, ConfigurationManager configuration, ConfigureHostBuilder host);
-}

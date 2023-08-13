@@ -5,7 +5,8 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints.Product;
 
-[EndpointHttpMethod(HttpMethodTypes.POST)]
+[EndpointHttpPost]
+[EndpointRoute(typeof(Add))]
 public class Add : BaseEndpointSync.WithRequest<Classes.Product>.WithResult<bool>
 {
   public override bool Handle(HttpContext context, [FromBody] Classes.Product product)

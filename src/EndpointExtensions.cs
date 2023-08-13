@@ -2,32 +2,30 @@
 using AspNetCore.MinimalApi.Ext.Enums;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AspNetCore.MinimalApi.Ext;
 
 public static class EndpointExtensions
 {
-  public static void UseMinimalApiEndpoints(this WebApplication app, Action<EndpointOptions> action)
+
+  public static void AddMinimalApiEndpointOptions(this WebApplicationBuilder builder, Action<EndpointOptions> action)
   {
     var options = new EndpointOptions();
     action(options);
-    InternalUseEndpoints(app, options);
+    EndpointOptions.Options = options;
+  }
+  
+  public static void AddMinimalApiEndpointOptions(this WebApplicationBuilder builder, EndpointOptions options)
+  {
+    EndpointOptions.Options = options;
   }
 
-  public static void UseMinimalApiEndpoints(this WebApplication app, EndpointOptions options)
-  {
-    InternalUseEndpoints(app, options);
-  }
 
   public static void UseMinimalApiEndpoints(this WebApplication app)
   {
-    var options = new EndpointOptions();
-    InternalUseEndpoints(app, options);
-  }
-
-  private static void InternalUseEndpoints(this WebApplication app, EndpointOptions options)
-  {
+    var options = EndpointOptions.Options;
     var entryAssembly = Assembly.GetEntryAssembly();
     var mainName = entryAssembly?.GetName().Name ?? throw new ArgumentNullException(nameof(entryAssembly));
     var results = entryAssembly.GetExportedTypeResults();
@@ -52,11 +50,11 @@ public static class EndpointExtensions
         foreach (var httpMethod in classResult.HttpMethods) {
           var call = httpMethod switch
           {
-            HttpMethodTypes.POST => app.MapPost(path, methodDelegate),
-            HttpMethodTypes.GET => app.MapGet(path, methodDelegate),
-            HttpMethodTypes.PUT => app.MapPut(path, methodDelegate),
-            HttpMethodTypes.DELETE => app.MapDelete(path, methodDelegate),
-            HttpMethodTypes.PATCH => app.MapPatch(path, methodDelegate),
+            HttpMethodType.POST => app.MapPost(path, methodDelegate),
+            HttpMethodType.GET => app.MapGet(path, methodDelegate),
+            HttpMethodType.PUT => app.MapPut(path, methodDelegate),
+            HttpMethodType.DELETE => app.MapDelete(path, methodDelegate),
+            HttpMethodType.PATCH => app.MapPatch(path, methodDelegate),
             _ => throw new ArgumentOutOfRangeException(nameof(httpMethod))
           };
 

@@ -7,21 +7,20 @@ public class CORSSetup : IApplicationSetup, IBuilderServiceSetup
 {
   internal string _myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
+  public int InitializationOrder { get; } = 1;
   public void InitializeApplication(WebApplication app)
   {
     app.UseCors(_myAllowSpecificOrigins);
   }
 
-  public void InitializeServices(IServiceCollection services, ConfigurationManager configuration,
-    ConfigureHostBuilder host)
+  public void InitializeServices(WebApplicationBuilder builder)
   {
-    var appSettings = configuration.GetSection("AppSettings").Get<AppSettings>();
+    var appSettings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
 
-    services.AddCors(options => {
+    builder.Services.AddCors(options => {
       options.AddPolicy(_myAllowSpecificOrigins,
         builder => {
-          builder.WithOrigins(appSettings.CorsAllowedUrls.ToArray()).AllowAnyMethod().AllowAnyHeader();
-          ;
+          builder.WithOrigins(appSettings?.CorsAllowedUrls.ToArray()).AllowAnyMethod().AllowAnyHeader();
         });
     });
   }

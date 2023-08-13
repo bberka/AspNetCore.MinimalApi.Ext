@@ -2,10 +2,17 @@
 
 namespace AspNetCore.MinimalApi.Ext.Sample.Setup;
 
-public class EndpointsSetup : IApplicationSetup
+public class EndpointsSetup : IApplicationSetup,IBuilderServiceSetup
 {
+  public int InitializationOrder => 1;
   public void InitializeApplication(WebApplication app)
   {
-    app.UseMinimalApiEndpoints(x => { x.GlobalPrefix = "api"; });
+    app.UseMinimalApiEndpoints();
+  }
+  public void InitializeServices(WebApplicationBuilder builder)
+  {
+    builder.AddMinimalApiEndpointOptions(x => {
+      x.GlobalPrefix = "api/v1";
+    });
   }
 }

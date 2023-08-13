@@ -4,7 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints.Product;
 
-[EndpointHttpMethod(HttpMethodTypes.GET)]
+[EndpointMethod(HttpMethodType.GET)]
 public class GetAll : BaseEndpointSync.WithoutRequest.WithResult<List<Classes.Product>>
 {
   public override List<Classes.Product> Handle(HttpContext context)

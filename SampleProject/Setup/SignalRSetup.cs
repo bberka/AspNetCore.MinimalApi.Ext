@@ -5,6 +5,7 @@ namespace AspNetCore.MinimalApi.Ext.Sample.Setup;
 
 public class SignalRSetup : IApplicationSetup, IBuilderServiceSetup
 {
+  public int InitializationOrder { get; } = 1;
   public void InitializeApplication(WebApplication app)
   {
     app.UseDefaultFiles();
@@ -13,9 +14,8 @@ public class SignalRSetup : IApplicationSetup, IBuilderServiceSetup
     app.MapHub<ChatHub>("/chat");
   }
 
-  public void InitializeServices(IServiceCollection services, ConfigurationManager configuration,
-    ConfigureHostBuilder host)
+  public void InitializeServices(WebApplicationBuilder builder)
   {
-    services.AddSignalR();
+    builder.Services.AddSignalR();
   }
 }

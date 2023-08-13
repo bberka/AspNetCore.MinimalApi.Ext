@@ -11,7 +11,7 @@ public class ChatHub : Hub
   private readonly static object _lock = new();
 
   //disconnect, remove user from list
-  public override async Task OnDisconnectedAsync(Exception exception)
+  public override async Task OnDisconnectedAsync(Exception? exception)
   {
     lock (_lock) {
       var users = Users.Where(u => u.ConnectionId == Context.ConnectionId).ToList();
@@ -54,7 +54,7 @@ public class ChatHub : Hub
 
   private class User
   {
-    public string ConnectionId { get; set; }
-    public string Name { get; set; }
+    public string ConnectionId { get; set; } = null!;
+    public string Name { get; set; } = null!;
   }
 }

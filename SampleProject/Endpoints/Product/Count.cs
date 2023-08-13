@@ -3,7 +3,7 @@ using AspNetCore.MinimalApi.Ext.Enums;
 
 namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints.Product;
 
-[EndpointHttpMethod(HttpMethodTypes.POST)]
+[EndpointMethod(HttpMethodType.POST)]
 public class Count : BaseEndpointSync.WithoutRequest.WithResult<int>
 {
   public override int Handle(HttpContext context)

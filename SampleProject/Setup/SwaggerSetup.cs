@@ -6,6 +6,7 @@ namespace AspNetCore.MinimalApi.Ext.Sample.Setup;
 
 public class SwaggerSetup : IBuilderServiceSetup, IApplicationSetup
 {
+  public int InitializationOrder { get; } = 1;
   public void InitializeApplication(WebApplication app)
   {
     var swaggerSettings =
@@ -27,17 +28,18 @@ public class SwaggerSetup : IBuilderServiceSetup, IApplicationSetup
     }
   }
 
-  public void InitializeServices(IServiceCollection services, ConfigurationManager configuration,
-    ConfigureHostBuilder host)
+  public void InitializeServices(WebApplicationBuilder builder)
   {
-    var swaggerSettings = configuration.GetSection("SwaggerSettings").Get<SwaggerSettings>() ?? new SwaggerSettings();
+    var swaggerSettings = builder.Configuration.GetSection("SwaggerSettings").Get<SwaggerSettings>() ??
+                          new SwaggerSettings();
 
     if (swaggerSettings != null) {
-      var azureAd = configuration.GetSection("AzureAd").Get<AzureAd>();
+      var azureAd = builder.Configuration.GetSection("AzureAd").Get<AzureAd>();
 
-      services.AddEndpointsApiExplorer();
+      builder.Services.AddEndpointsApiExplorer();
 
-      services.AddSwaggerGen(c => {
+      builder.Services.AddSwaggerGen(c => {
+        c.ConfigureMinimalApiTags();
         c.SwaggerDoc(swaggerSettings.Version, new OpenApiInfo
         {
           Title = swaggerSettings.ApplicationName,

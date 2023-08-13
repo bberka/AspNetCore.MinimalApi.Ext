@@ -7,6 +7,7 @@ namespace AspNetCore.MinimalApi.Ext.Sample.Setup;
 
 public class AzureADAuthenticationSetup : IApplicationSetup, IBuilderServiceSetup
 {
+  public int InitializationOrder { get; } = 1;
   public void InitializeApplication(WebApplication app)
   {
     var azureAd = app.Configuration.GetSection("AzureAd").Get<AzureAd>();
@@ -17,14 +18,13 @@ public class AzureADAuthenticationSetup : IApplicationSetup, IBuilderServiceSetu
     }
   }
 
-  public void InitializeServices(IServiceCollection services, ConfigurationManager configuration,
-    ConfigureHostBuilder host)
+  public void InitializeServices(WebApplicationBuilder builder)
   {
-    var azureAd = configuration.GetSection("AzureAd").Get<AzureAd>();
+    var azureAd = builder.Configuration.GetSection("AzureAd").Get<AzureAd>();
 
     if (azureAd != null)
-      services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddMicrosoftIdentityWebApi(options => { configuration.Bind("AzureAd", options); },
-          options => { configuration.Bind("AzureAd", options); });
+      builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddMicrosoftIdentityWebApi(options => { builder.Configuration.Bind("AzureAd", options); },
+          options => { builder.Configuration.Bind("AzureAd", options); });
   }
 }

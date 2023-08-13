@@ -15,17 +15,10 @@ public static class SetupApplicationMiddlewareExtensions
       .ExportedTypes
       .Where(x => typeof(IApplicationSetup).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
       .Select(Activator.CreateInstance)
-      .Cast<IApplicationSetup>();
+      .Cast<IApplicationSetup>()
+      .OrderBy(x => x.InitializationOrder);
 
     foreach (var result in results) result.InitializeApplication(app);
   }
 }
 
-public interface IApplicationSetup
-{
-  /// <summary>
-  ///   This is where you can add any app setup
-  /// </summary>
-  /// <param name="app"></param>
-  void InitializeApplication(WebApplication app);
-}

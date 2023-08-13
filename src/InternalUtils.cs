@@ -9,6 +9,7 @@ namespace AspNetCore.MinimalApi.Ext;
 
 internal static class InternalUtils
 {
+  
   private const string DefaultEndpointMethodName = "Handle";
 
   internal static string GetUrlPath(EndpointOptions options, EndpointRouteAttribute? routeAttribute,
@@ -89,10 +90,10 @@ internal static class InternalUtils
       .ToList();
     return methods;
   }
-  internal static HttpMethodTypes[] GetHttpMethods(this Type type)
+  internal static HttpMethodType[] GetHttpMethods(this Type type)
   {
-    var methods = type.GetCustomAttribute<EndpointHttpMethodAttribute>()?.HttpMethods;
-    return methods?.ToArray() ?? new[] { HttpMethodTypes.GET };
+    var methods = type.GetCustomAttribute<EndpointMethodAttribute>()?.HttpMethods;
+    return methods?.ToArray() ?? new[] { HttpMethodType.GET };
 
     // var methods = type.GetCustomAttribute<EndpointHttpMethodAttribute>()?.HttpMethods;
     // if (methods is null || methods.Length == 0) {

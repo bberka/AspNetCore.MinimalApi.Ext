@@ -30,5 +30,5 @@ internal sealed class ExportedClassTypeResult
   public EndpointRouteAttribute? Route { get; set; }
   public Type[] Filters { get; set; }
   public IAuthorizeData? Authorize { get; set; }
-  public HttpMethodTypes[] HttpMethods { get; set; }
+  public HttpMethodType[] HttpMethods { get; set; }
 }
