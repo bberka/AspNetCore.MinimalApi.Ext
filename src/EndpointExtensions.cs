@@ -15,11 +15,13 @@ public static class EndpointExtensions
     var options = new EndpointOptions();
     action(options);
     EndpointOptions.Options = options;
+    builder.Services.AddSingleton(options);
   }
   
   public static void AddMinimalApiEndpointOptions(this WebApplicationBuilder builder, EndpointOptions options)
   {
     EndpointOptions.Options = options;
+    builder.Services.AddSingleton(options);
   }
 
 

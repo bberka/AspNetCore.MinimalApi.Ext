@@ -148,6 +148,20 @@ This is a complete Program.cs file!
     app.Run();
 ```
 
+### Changelogs
+
+#### 3.0.0
+- BuilderSetup changed so that it only asks for WebApplicationBuilder
+- Added new attributes for customizing endpoints methods EndpointHttpGet etc.
+- Added built-in support for better swagger generation. With few changes you can generate swagger with folders as controllers.
+- Added new methods that adds Endpoint options as singleton
+
+#### 2.0.0
+- Project forked and cleaned up.
+- Added support for custom attributes.
+- Seperated attributes as a better design choice.
+- Better namings
+- Forced single endpoint per class.
 
 
 
