@@ -8,8 +8,7 @@ namespace AspNetCore.MinimalApi.Ext.Models;
 
 internal sealed class ExportedClassTypeResult
 {
-  public ExportedClassTypeResult(Type type)
-  {
+  public ExportedClassTypeResult(Type type) {
     Type = type;
     Route = type.GetCustomAttribute<EndpointRouteAttribute>();
     if (Route is null) {

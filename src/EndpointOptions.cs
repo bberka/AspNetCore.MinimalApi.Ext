@@ -13,9 +13,8 @@ public sealed class EndpointOptions
   public string? GlobalPrefix { get; set; } = "api";
 
   internal bool UseGlobalPrefix => !string.IsNullOrWhiteSpace(GlobalPrefix) && GlobalPrefix != "";
-  
+
   internal static EndpointOptions Default => new();
 
   internal static EndpointOptions Options { get; set; } = Default;
-
 }

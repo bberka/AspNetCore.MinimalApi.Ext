@@ -4,7 +4,7 @@ namespace AspNetCore.MinimalApi.Ext.Setup;
 
 public interface IApplicationSetup
 {
-  public int InitializationOrder { get;  }
+  public int InitializationOrder { get; }
 
   /// <summary>
   ///   This is where you can add any app setup

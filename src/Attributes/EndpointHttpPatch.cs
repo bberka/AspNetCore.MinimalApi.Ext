@@ -4,7 +4,5 @@ namespace AspNetCore.MinimalApi.Ext.Attributes;
 
 public sealed class EndpointHttpPatch : EndpointMethodAttribute
 {
-  public EndpointHttpPatch() : base(HttpMethodType.PATCH)
-  {
-  }
+  public EndpointHttpPatch() : base(HttpMethodType.PATCH) { }
 }

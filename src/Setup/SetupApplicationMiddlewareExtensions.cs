@@ -9,16 +9,14 @@ public static class SetupApplicationMiddlewareExtensions
   ///   This will enable any classes implementing IApplicationSetup
   /// </summary>
   /// <param name="app"></param>
-  public static void UseApplicationSetup(this WebApplication app)
-  {
+  public static void UseApplicationSetup(this WebApplication app) {
     var results = Assembly.GetCallingAssembly()
-      .ExportedTypes
-      .Where(x => typeof(IApplicationSetup).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-      .Select(Activator.CreateInstance)
-      .Cast<IApplicationSetup>()
-      .OrderBy(x => x.InitializationOrder);
+                          .ExportedTypes
+                          .Where(x => typeof(IApplicationSetup).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                          .Select(Activator.CreateInstance)
+                          .Cast<IApplicationSetup>()
+                          .OrderBy(x => x.InitializationOrder);
 
     foreach (var result in results) result.InitializeApplication(app);
   }
 }
-

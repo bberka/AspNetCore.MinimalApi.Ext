@@ -4,7 +4,5 @@ namespace AspNetCore.MinimalApi.Ext.Attributes;
 
 public sealed class EndpointHttpPut : EndpointMethodAttribute
 {
-  public EndpointHttpPut() : base(HttpMethodType.PUT)
-  {
-  }
+  public EndpointHttpPut() : base(HttpMethodType.PUT) { }
 }

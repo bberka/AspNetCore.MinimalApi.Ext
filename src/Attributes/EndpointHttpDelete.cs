@@ -4,7 +4,5 @@ namespace AspNetCore.MinimalApi.Ext.Attributes;
 
 public sealed class EndpointHttpDelete : EndpointMethodAttribute
 {
-  public EndpointHttpDelete() : base(HttpMethodType.DELETE)
-  {
-  }  
+  public EndpointHttpDelete() : base(HttpMethodType.DELETE) { }
 }

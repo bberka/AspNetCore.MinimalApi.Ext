@@ -3,7 +3,6 @@ using AspNetCore.MinimalApi.Ext.Enums;
 using AspNetCore.MinimalApi.Ext.Exceptions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AspNetCore.MinimalApi.Ext;
@@ -31,23 +30,19 @@ public static class EndpointExtensions
     foreach (var classResult in results) {
       var constructor = classResult.Type.GetConstructors();
       var anyPublicCtor = constructor.Any(x => x.IsPublic);
-      if (!anyPublicCtor) {
-        throw new MustHavePublicConstructorException(classResult.Type);
-      }
+      if (!anyPublicCtor) throw new MustHavePublicConstructorException(classResult.Type);
       var anyEmptyCtor = constructor.Any(x => x.GetParameters().Length == 0);
-      if (!anyEmptyCtor) {
-        throw new MustHaveParameterlessConstructorException(classResult.Type);
-      }
+      if (!anyEmptyCtor) throw new MustHaveParameterlessConstructorException(classResult.Type);
       var instance = ActivatorUtilities.CreateInstance(app.Services, classResult.Type);
       if (instance is null)
         continue;
       var methods = classResult.Type.GetEndpointHandlerMethods();
       foreach (var methodResult in methods) {
         var methodDelegate = methodResult.Method.CreateDelegate(methodResult.Method.GetDelegateType(), instance);
-        var path = InternalUtils.GetUrlPath(options, 
-                                            classResult.Route, 
+        var path = InternalUtils.GetUrlPath(options,
+                                            classResult.Route,
                                             classResult.Type.Name,
-                                            classResult.Type.GetContainingFolderName(), 
+                                            classResult.Type.GetContainingFolderName(),
                                             mainName);
         var globalFilters = options.EndpointFilters;
         foreach (var httpMethod in classResult.HttpMethods) {

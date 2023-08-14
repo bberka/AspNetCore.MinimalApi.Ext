@@ -1,10 +1,8 @@
 namespace AspNetCore.MinimalApi.Ext.Exceptions;
 
-public class MustHavePublicConstructorException : Exception
+internal class MustHavePublicConstructorException : Exception
 {
- 
   private const string ErrorMessage = "Class of {0} type must have a public constructor.";
-  public MustHavePublicConstructorException(Type type) : base(string.Format(ErrorMessage, type.Name)) {
-    
-  }
+
+  public MustHavePublicConstructorException(Type type) : base(string.Format(ErrorMessage, type.Name)) { }
 }
