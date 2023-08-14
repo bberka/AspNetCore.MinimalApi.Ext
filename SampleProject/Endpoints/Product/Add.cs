@@ -7,9 +7,9 @@ namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints.Product;
 
 [EndpointHttpPost]
 [EndpointRoute(typeof(Add))]
-public class Add : BaseEndpointSync.WithRequest<Classes.Product>.WithResult<bool>
+public class Add : BaseEndpoint
 {
-  public override bool Handle(HttpContext context, [FromBody] Classes.Product product)
+  public bool Handle(HttpContext context, [FromBody] Classes.Product product)
   {
     var cache = context.RequestServices.GetRequiredService<MemoryCache>();
     var products = cache.Get<List<Classes.Product>>("Products") ?? new List<Classes.Product>();

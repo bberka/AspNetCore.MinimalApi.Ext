@@ -6,9 +6,9 @@ namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints;
 
 [EndpointRoute("NameOverride")]
 [EndpointMethod(HttpMethodType.POST)]
-public class OverwrittenRouteEndPoint : BaseEndpointSync.WithoutRequest.WithResult<string>
+public class OverwrittenRouteEndPoint : BaseEndpoint
 {
-  public override string Handle(HttpContext context)
+  public string Handle(HttpContext context)
   {
     return "Hello World!";
   }

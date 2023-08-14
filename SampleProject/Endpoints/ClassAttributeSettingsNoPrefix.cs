@@ -1,8 +1,8 @@
 ﻿namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints;
 
-public class BasicEndpointExample : BaseEndpointSync.WithoutRequest.WithResult<string>
+public class BasicEndpointExample : BaseEndpoint
 {
-  public override string Handle(HttpContext context)
+  public string Handle(HttpContext context)
   {
     return "Hello World!";
   }
