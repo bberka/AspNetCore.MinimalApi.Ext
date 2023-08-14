@@ -17,7 +17,7 @@ public static class EndpointExtensions
     EndpointOptions.Options = options;
     builder.Services.AddSingleton(options);
   }
-  
+
   public static void AddMinimalApiEndpointOptions(this WebApplicationBuilder builder, EndpointOptions options)
   {
     EndpointOptions.Options = options;
@@ -34,15 +34,25 @@ public static class EndpointExtensions
     if (results.Count == 0) return;
 
     foreach (var classResult in results) {
-      var classInstance = Activator.CreateInstance(classResult.Type);
+      var constructor = classResult.Type.GetConstructors().FirstOrDefault();
+      object? instance;
+      if (constructor is not null) {
+        var arguments = constructor.GetParameters()
+          .Select(parameter => app.Services.GetRequiredService(parameter.ParameterType))
+          .ToArray();
+        instance = Activator.CreateInstance(classResult.Type, arguments);
+      }
+      else {
+        instance = Activator.CreateInstance(classResult.Type);
+      }
 
-      if (classInstance == null)
+      if (instance == null)
         continue;
 
       var methods = classResult.Type.GetEndpointHandlerMethods();
 
       foreach (var methodResult in methods) {
-        var methodDelegate = methodResult.Method.CreateDelegate(methodResult.Method.GetDelegateType(), classInstance);
+        var methodDelegate = methodResult.Method.CreateDelegate(methodResult.Method.GetDelegateType(), instance);
 
         var path = InternalUtils.GetUrlPath(options, classResult.Route, classResult.Type.Name,
           classResult.Type.GetContainingFolderName(), mainName);
