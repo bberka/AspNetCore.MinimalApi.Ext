@@ -11,7 +11,7 @@ public class EndpointsSetup : IApplicationSetup,IBuilderServiceSetup
   }
   public void InitializeServices(WebApplicationBuilder builder)
   {
-    builder.AddMinimalApiEndpointOptions(x => {
+    builder.Services.AddMinimalApiEndpointOptions(x => {
       x.GlobalPrefix = "api/v1";
     });
   }
