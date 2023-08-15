@@ -10,13 +10,14 @@ public static class EndpointExtensions
   /// <summary>
   ///   Adds the minimal API endpoint options to the service collection as singleton and for library to use.
   /// </summary>
-  /// <param name="builder"></param>
+  /// <param name="services"></param>
   /// <param name="action"></param>
-  public static void AddMinimalApiEndpointOptions(this WebApplicationBuilder builder, Action<EndpointOptions> action) {
+  public static IServiceCollection AddMinimalApiEndpointOptions(this IServiceCollection services, Action<EndpointOptions> action) {
     var options = new EndpointOptions();
     action(options);
     EndpointOptions.Options = options;
-    builder.Services.AddSingleton(options);
+    services.AddSingleton(options);
+    return services;
   }
 
   /// <summary>

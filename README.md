@@ -5,17 +5,11 @@ A set of tools to simplify creating AspNetCore applications, specifically when u
 The middleware helps clean up your code by making it easy to break the application startup into seperate classes,
 ideally named by what their purpose is.
 
-## Why forked ?
+This project is forked and a lot of changes has been made.
+[Click to go original repository](https://github.com/edelyn/Selfrated.MinimalAPI.Middleware)
+## Requirements
 
-- Code is cleaned up and simplified.
-- Added support for custom attributes.
-- Seperated attributes as a better design choice.
-- Better namings
-- Forced single endpoint per class.
-
-## Reqiurements
-
-ASPNetCore applications, with at least .NET 7.0
+AspNetCore applications, with at least .NET 7.0
 
 ## Installation Instructions
 
@@ -30,13 +24,10 @@ Install the package from CLI:
 dotnet add package AspNetCore.MinimalApi.Ext
 ```
 
-## Usage
-
-
 ## Things to know before using
 - Library only supports .NET 7.0 and above.
 - You can not use classes with multiple endpoints. Each class must have single method that handles the endpoint. The default is method named "Handle" however you can change this by overriding EndpointOptions.
-- Currently only class level custom attributes are supported. 
+- Currently only class level custom attributes are supported.
 - Model binding to query is not supported however you can use FromQueryAttribute to bind to query.
 - IActionFilters etc. are not supported.
 - Swagger custom tag generation containing folders as controllers. (You can check sample project)
@@ -46,21 +37,23 @@ dotnet add package AspNetCore.MinimalApi.Ext
 
 This project still under development and there might be breaking changes or bugs, be careful when you use it.
 
+
+## Usage
+
 ## Endpoint Attributes
 
 By utilizing these attributes, you can quickly and easily get endpoints created from any file that uses them. By default
-the names of the classes/methods will be the names of the endpoints, requiring as little code/effort as possible.
+the names of the containing folder path and class name will be the names of the endpoints, requiring as little code/effort as possible.
 
-This is a fully functional file that will create a fully functional endpoint for /Sample/TestEndpoint (
-i.e. https://localhost:7000/Sample/TestEndpoint)!
+This is a fully functional file that will create a fully functional endpoint for /Sample
 
 ```csharp
-using Selfrated.MinimalAPI.Middleware.Attributes;
+using AspNetCore.MinimalApi.Ext;
 
 namespace WebApplication1.Endpoints;
 
-
-public class Sample : BaseEndpoint
+[Endpoint]
+public class Sample 
 {
     public string Handle(HttpContext context)
     {
@@ -69,87 +62,188 @@ public class Sample : BaseEndpoint
 }
 ```
 
-Every class that has BaseEndpoint as a parent will automatically be processed for creating endpoints.
-Only Handle method will be considered as an endpoint.
 
-Library forces you to have single endpoint per class.
+#### Set custom HttpMethod
+
+```csharp
+using AspNetCore.MinimalApi.Ext;
+
+namespace WebApplication1.Endpoints;
+
+[Endpoint(HttpMethodType.Post)] // Url will be PREFIX/SamplePost
+public class SamplePost  
+{
+    public string Handle(HttpContext context)
+    {
+        return "Hello World!";
+    }   
+}
+```
+
+#### Override route
+
+```csharp
+using AspNetCore.MinimalApi.Ext;
+
+namespace WebApplication1.Endpoints;
+
+[Endpoint(HttpMethodType.Post, CustomRoute = "Sample/Post")] // Url will be PREFIX/Sample/Post
+public class SamplePost 
+{
+    public string Handle(HttpContext context)
+    {
+        return "Hello World!";
+    }   
+}
+```
+
+#### Override action name
+
+```csharp
+using AspNetCore.MinimalApi.Ext;
+
+namespace WebApplication1.Endpoints;
+
+[Endpoint(HttpMethodType.Post, ActionName = "Sample_Post")] // Url will be PREFIX/Sample_Post
+public class SamplePost 
+{
+    public string Handle(HttpContext context)
+    {
+        return "Hello World!";
+    }   
+}
+```
+
+Every class that has Endpoint attribute will automatically be processed for creating endpoints.
+Only one "Handle" method will be considered as an endpoint.
+You can change the name of the method by overriding EndpointOptions.
+
+Library does not support multiple endpoints per class.
 You can create multiple classes in a single file but not 2 or more endpoints in a single class.
 
-### EndpointAuthorizeAttribute
+### EndpointAttribute
 
-By using this on class, it will require authorization to access the endpoint.
+By using this on attribute;
+- You can set HttpMethod which is GET by default.
+- You can set custom route override. Which will override the automatic route generation.
+- You can set custom action name override. Which will only override the class name in automatic generation. (If you use CustomRoute setting this makes no sense)
+
+If you do not pass any parameters, HttpMethod will be GET and route will be generated automatically.
 
 ### EndpointFilterAttribute
 
-By using this on class, you can use custom filters that assigned from IEndpointFilter
+By using this on attribute, you can use custom filters that assigned from IEndpointFilter interface.
 
-### EndpointRouteAttribute
+CustomFilter.cs
+```csharp
+/// <summary>
+///   This is an example of a custom filter that can be used to authorize/validate a request.
+/// </summary>
+public class CustomFilter : IEndpointFilter
+{
+  public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+  {
+    var idFromQuery = context.HttpContext.Request.Query["id"].FirstOrDefault();
+    if (idFromQuery != "1234") context.HttpContext.Response.StatusCode = 401;
+    return await next(context);
+  }
+}
+```
+EndpointFile.cs
+```csharp
+using AspNetCore.MinimalApi.Ext;
 
-By using this on class, you can override the route of the endpoint.
+namespace WebApplication1.Endpoints;
 
-### EndpointHttpMethodAttribute
-
-By using this on class, you can override the http method of the endpoint.
-You can use multiple and if you use none it will be GET by default.
+[Endpoint(HttpMethodType.Post, ActionName = "Sample_Endpoint_With_Filter")] // Url will be PREFIX/Sample_Post
+[EndpointFilter(typeof(CustomFilter))]
+public class SampleFilterEndpoint
+{
+    public string Handle(HttpContext context)
+    {
+        return "Hello World!";
+    }   
+}
+```
 
 ### Why not using default attributes ?
 
-Currently default attributes provided by AspNetCore is not supported but support can be added easily.
+Currently here are the supported attributes;
+- [AllowAnonymous]
+- [Authorize]
 
-Custom attributes provided by the library currently only way to go and can only be used on the class not method.
+Custom attributes provided by the library currently only way to set Method and route and can only be used on the classes.
 
-### EndpointMiddlewareOptions
+### EndpointOptions
 
-You can use EndpointMiddlewareOptions to configure the middleware.
+You can use EndpointOptions to configure the middleware.
 
+This will add EndpointOptions as singleton to the services.
 ```csharp
-app.UseMinimalApiEndpoints(x => { 
-  x.GlobalPrefix = "api"; //Url: /api/Product/Get etc.
+builder.Services.AddMinimalApiEndpointOptions(x => { 
+  x.GlobalPrefix = "api/v1"; //Url: /api/Product/Get etc.
 
   //Global filters
-  x.EndpointFilters = new List<Type> { typeof(CustomFilter) };
+  x.EndpointFilters = new List<Type> { 
+      typeof(CustomFilter) 
+  };
 
-  //Global authorization
+  //Global authorization filter
   x.AuthorizeData = new AuthorizeData(){
     Policy = "PolicyName"
   };
+  
+  //Removes "Endpoints" or "Endpoint" string from route
+  //Converts auto generated route from /Image/GetImageEndpoint to /Image/GetImage
+  x.RemoveEndpointStringInRoute = true; 
+  
+  //The method name that will be taken and used as endpoint method.
+  x.DefaultEndpointMethodName = "Handle";
 });
 ```
 
-### What is not supported ?
+### Configuring Swagger Tags
+Since the automatic swagger generation will take class names as tags, it won't make sense to use default one.
 
-- Currently only class level custom attributes are supported.
-- Model binding to query is not supported however you can use FromQueryAttribute to bind to query.
-- IActionFilters etc. are not supported.
-- Swagger generation with folders as controllers
 
+```csharp
+builder.Services.AddSwaggerGen(c => {
+        //This will create tags from folder names
+    c.ConfigureMinimalApiTags();
+});
+```
 ## IBuilderServiceSetup and IApplicationSetup
 
 Any objects that implement IBuilderServiceSetup and/or IApplicationSetup will be processed when the WebApplication is
-built. This happens once, when the applcation starts.
+built. This happens once, when the application starts.
 
 The following sample file (Authentication.cs) sets up azure AD authentication with the application.
 
 ```csharp
-public class Authentication : IApplicationSetup, IBuilderServiceSetup
+public class AzureADAuthenticationSetup : IApplicationSetup, IBuilderServiceSetup
 {
-    public void InitializeApplication(WebApplication app)
-    {
-        app.UseAuthentication();
-        app.UseAuthorization();
-    }
+  
+  public int InitializationOrder { get; } = 1; // Initialization order only applies to IApplicationSetup setup
+  public void InitializeApplication(WebApplication app)
+  {
+    var azureAd = app.Configuration.GetSection("AzureAd").Get<AzureAd>();
 
-    public void InitializeServices(IServiceCollection services, ConfigurationManager configuration, ConfigureHostBuilder host)
-    {
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddMicrosoftIdentityWebApi(options =>
-        {
-            configuration.Bind("AzureAd", options);
-        },
-        options => { configuration.Bind("AzureAd", options); });
+    if (azureAd != null) {
+      app.UseAuthentication();
+      app.UseAuthorization();
     }
+  }
+
+  public void InitializeServices(WebApplicationBuilder builder)
+  {
+    var azureAd = builder.Configuration.GetSection("AzureAd").Get<AzureAd>();
+
+    if (azureAd != null)
+      builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddMicrosoftIdentityWebApi(options => { builder.Configuration.Bind("AzureAd", options); },
+          options => { builder.Configuration.Bind("AzureAd", options); });
+  }
 }
-
 ```
 
 ### Setup (Program.cs)
@@ -174,6 +268,14 @@ This is a complete Program.cs file!
 ```
 
 ### Changelogs
+
+#### 3.2.0
+- ReadMe updated
+- Attribute changes
+- Optimizations
+- Custom exceptions
+- Removed BaseEndpoint abstract class
+- New EndpointOptions
 
 #### 3.0.0
 
