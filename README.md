@@ -1,6 +1,6 @@
 ﻿# Minimal API Middleware
 
-A set of tools to simplify creating ASPNetCore applications, specifically when using MinimalAPIs.
+A set of tools to simplify creating AspNetCore applications, specifically when using MinimalAPIs.
 
 The middleware helps clean up your code by making it easy to break the application startup into seperate classes,
 ideally named by what their purpose is.
@@ -19,7 +19,19 @@ ASPNetCore applications, with at least .NET 7.0
 
 ## Installation Instructions
 
-This is a fork from original project there is no package yet. You can only install it from github.
+Install the package from NuGet:
+
+```bash
+Install-Package AspNetCore.MinimalApi.Ext
+```
+
+Install the package from CLI:
+```bash
+dotnet add package AspNetCore.MinimalApi.Ext
+```
+
+## Usage
+
 
 ## Things to know before using
 - Library only supports .NET 7.0 and above.
@@ -31,6 +43,7 @@ This is a fork from original project there is no package yet. You can only insta
 - Each endpoint class must have [Endpoint] attribute. You can set custom route override, action name override and HttpMethod.
 - You can only set 1 HttpMethod per class.
 - The class constructor must be parameterless and public, otherwise it will throw an exception
+
 This project still under development and there might be breaking changes or bugs, be careful when you use it.
 
 ## Endpoint Attributes
