@@ -3,7 +3,7 @@
 namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints;
 
 [Endpoint]
-public class OverwrittenRouteEndPoint : BaseEndpoint
+public class OverwrittenRouteEndPoint 
 {
 
   public string Handle(HttpContext context)

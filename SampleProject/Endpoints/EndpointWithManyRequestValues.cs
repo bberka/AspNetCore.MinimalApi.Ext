@@ -1,7 +1,7 @@
 ﻿namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints;
 
 [Endpoint]
-public class EndpointWithManyRequestValues : BaseEndpoint
+public class EndpointWithManyRequestValues
 {
 
   public string Handle(HttpContext context, string id, int my)
@@ -10,7 +10,7 @@ public class EndpointWithManyRequestValues : BaseEndpoint
   }
 }
 [Endpoint]
-public class EndpointWithManyRequestValues2 : BaseEndpoint
+public class EndpointWithManyRequestValues2
 {
 
   public string Handle(HttpContext context, int id, string name)

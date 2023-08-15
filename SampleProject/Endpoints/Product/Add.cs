@@ -5,7 +5,7 @@ namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints.Product;
 
 
 [Endpoint(HttpMethodType.Delete)]
-public class Add : BaseEndpoint 
+public class Add
 {
 
   public bool Handle(HttpContext context, [FromBody] Classes.Product product)

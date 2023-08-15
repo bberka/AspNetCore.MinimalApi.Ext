@@ -7,6 +7,11 @@ namespace AspNetCore.MinimalApi.Ext;
 
 public static class EndpointExtensions
 {
+  /// <summary>
+  ///   Adds the minimal API endpoint options to the service collection as singleton and for library to use.
+  /// </summary>
+  /// <param name="builder"></param>
+  /// <param name="action"></param>
   public static void AddMinimalApiEndpointOptions(this WebApplicationBuilder builder, Action<EndpointOptions> action) {
     var options = new EndpointOptions();
     action(options);
@@ -14,17 +19,37 @@ public static class EndpointExtensions
     builder.Services.AddSingleton(options);
   }
 
+  /// <summary>
+  /// Adds the minimal API endpoint options to the service collection as singleton and for library to use.
+  /// </summary>
+  /// <param name="builder"></param>
+  /// <param name="options"></param>
   public static void AddMinimalApiEndpointOptions(this WebApplicationBuilder builder, EndpointOptions options) {
     EndpointOptions.Options = options;
     builder.Services.AddSingleton(options);
   }
 
+  /// <summary>
+  /// Initializes the minimal API endpoints from the entry assembly.
+  /// </summary>
+  /// <param name="app"></param>
+  /// <exception cref="NullReferenceException"></exception>
   public static void UseMinimalApiEndpoints(this WebApplication app) {
-    var results = Assembly.GetEntryAssembly().GetExportedTypeResults();
+    app.UseMinimalApiEndpoints(Assembly.GetEntryAssembly() ?? throw new NullReferenceException("Entry assembly is null"));
+  }
+
+  /// <summary>
+  /// Initializes the minimal API endpoints from the specified assembly.
+  /// </summary>
+  /// <param name="app"></param>
+  /// <param name="assembly"></param>
+  /// <exception cref="ArgumentOutOfRangeException"></exception>
+  public static void UseMinimalApiEndpoints(this WebApplication app, Assembly assembly) {
+    var results = assembly.GetExportedTypeResults();
     if (results.Count == 0) return;
     foreach (var classResult in results) {
       var instance = ActivatorUtilities.CreateInstance(app.Services, classResult.Type);
-      if (instance is not BaseEndpoint casted)
+      if (instance is null)
         continue;
       var methodDelegate = classResult.EndpointMethod.CreateDelegate(classResult.EndpointMethod.GetDelegateType(), instance);
       var apiPath = classResult.Type.CreateApiPathFromAssembly(classResult.EndpointAttribute);

@@ -13,11 +13,11 @@ internal sealed class ExportedClassTypeResult
     Filters = type.GetCustomAttributes<EndpointFilterAttribute>().Select(x => x.Type).ToArray();
     var endpoint = type.GetCustomAttribute<EndpointAttribute>();
     if (endpoint is not null)  EndpointAttribute = endpoint;
-    
+    else EndpointAttribute = new EndpointAttribute();
   }
-  public Type Type { get; set; }
-  public Type[] Filters { get; set; }
-  public IAuthorizeData? Authorize { get; set; }
-  public EndpointAttribute EndpointAttribute { get; set; } = new();
+  public Type Type { get; }
+  public Type[] Filters { get; }
+  public IAuthorizeData? Authorize { get; }
+  public EndpointAttribute EndpointAttribute { get; }
   public MethodInfo EndpointMethod { get; set; }
 }

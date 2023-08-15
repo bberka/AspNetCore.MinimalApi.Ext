@@ -3,7 +3,7 @@
 namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints.Product;
 [Endpoint]
 
-public class GetAll : BaseEndpoint
+public class GetAll 
 {
 
   public List<Classes.Product> Handle(HttpContext context) {

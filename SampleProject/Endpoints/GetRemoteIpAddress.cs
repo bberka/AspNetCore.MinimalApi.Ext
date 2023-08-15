@@ -1,7 +1,7 @@
 ﻿namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints;
 
 [Endpoint]
-public class GetRemoteIpAddress : BaseEndpoint
+public class GetRemoteIpAddress 
 {
 
   public string Handle(HttpContext context)

@@ -21,6 +21,18 @@ ASPNetCore applications, with at least .NET 7.0
 
 This is a fork from original project there is no package yet. You can only install it from github.
 
+## Things to know before using
+- Library only supports .NET 7.0 and above.
+- You can not use classes with multiple endpoints. Each class must have single method that handles the endpoint. The default is method named "Handle" however you can change this by overriding EndpointOptions.
+- Currently only class level custom attributes are supported. 
+- Model binding to query is not supported however you can use FromQueryAttribute to bind to query.
+- IActionFilters etc. are not supported.
+- Swagger custom tag generation containing folders as controllers. (You can check sample project)
+- Each endpoint class must have [Endpoint] attribute. You can set custom route override, action name override and HttpMethod.
+- You can only set 1 HttpMethod per class.
+- The class constructor must be parameterless and public, otherwise it will throw an exception
+This project still under development and there might be breaking changes or bugs, be careful when you use it.
+
 ## Endpoint Attributes
 
 By utilizing these attributes, you can quickly and easily get endpoints created from any file that uses them. By default

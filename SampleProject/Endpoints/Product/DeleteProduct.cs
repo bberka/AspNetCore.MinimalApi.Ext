@@ -3,7 +3,7 @@
 namespace AspNetCore.MinimalApi.Ext.Sample.Endpoints.Product;
 
 [Endpoint(HttpMethodType.Delete)]
-public class DeleteProduct : BaseEndpoint
+public class DeleteProduct 
 {
   public bool Handle(HttpContext context, int request)
   {

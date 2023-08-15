@@ -11,18 +11,25 @@ public sealed class EndpointOptions
   ///   Sets global prefix for all routes.
   /// </summary>
   public string? GlobalPrefix { get; set; } = "api";
-
-  public bool RemoveEndpointsStringInFolderName { get; set; } = true;
-  public bool RemoveEndpointStringInClassName { get; set; } = true;
   
+  /// <summary>
+  /// Removes "Endpoints" or "Endpoint" string from created route.
+  /// <br/>
+  /// This will not apply if Custom Route is set
+  /// </summary>
+  public bool RemoveEndpointStringInRoute { get; set; } = true;
   
-  public const string DefaultEndpointMethodName = "Handle";
+  /// <summary>
+  /// Endpoint method name. Default is "Handle"
+  /// </summary>
+  public string DefaultEndpointMethodName { get; set; } = "Handle";
 
   
-  internal bool UseGlobalPrefix => !string.IsNullOrWhiteSpace(GlobalPrefix) && GlobalPrefix != "";
+  internal bool UseGlobalPrefix => !string.IsNullOrWhiteSpace(GlobalPrefix) && GlobalPrefix != string.Empty;
 
-  private static EndpointOptions Default => new();
 
   internal static EndpointOptions Options { get; set; } = Default;
+  
+  private static EndpointOptions Default => new();
 
 }
