@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace AspNetCore.MinimalApi.Ext.Attributes;
+namespace AspNetCore.MinimalApi.Ext;
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 public class EndpointFilterAttribute : Attribute

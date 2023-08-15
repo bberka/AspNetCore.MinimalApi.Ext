@@ -12,9 +12,17 @@ public sealed class EndpointOptions
   /// </summary>
   public string? GlobalPrefix { get; set; } = "api";
 
+  public bool RemoveEndpointsStringInFolderName { get; set; } = true;
+  public bool RemoveEndpointStringInClassName { get; set; } = true;
+  
+  
+  public const string DefaultEndpointMethodName = "Handle";
+
+  
   internal bool UseGlobalPrefix => !string.IsNullOrWhiteSpace(GlobalPrefix) && GlobalPrefix != "";
 
-  internal static EndpointOptions Default => new();
+  private static EndpointOptions Default => new();
 
   internal static EndpointOptions Options { get; set; } = Default;
+
 }

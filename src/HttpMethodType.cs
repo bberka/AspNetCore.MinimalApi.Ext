@@ -1,10 +1,10 @@
-﻿namespace AspNetCore.MinimalApi.Ext.Enums;
+﻿namespace AspNetCore.MinimalApi.Ext;
 
-public enum HttpMethodType : byte
+public enum HttpMethodType
 {
-  GET,
-  POST,
-  PUT,
-  DELETE,
-  PATCH
+  Get,
+  Post,
+  Put,
+  Delete,
+  Patch,
 }

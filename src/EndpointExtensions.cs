@@ -1,6 +1,4 @@
 ﻿using System.Reflection;
-using AspNetCore.MinimalApi.Ext.Enums;
-using AspNetCore.MinimalApi.Ext.Exceptions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,48 +20,30 @@ public static class EndpointExtensions
   }
 
   public static void UseMinimalApiEndpoints(this WebApplication app) {
-    var options = EndpointOptions.Options;
-    var entryAssembly = Assembly.GetEntryAssembly();
-    var mainName = entryAssembly?.GetName().Name ?? throw new ArgumentNullException(nameof(entryAssembly));
-    var results = entryAssembly.GetExportedTypeResults();
+    var results = Assembly.GetEntryAssembly().GetExportedTypeResults();
     if (results.Count == 0) return;
     foreach (var classResult in results) {
-      var constructor = classResult.Type.GetConstructors();
-      var anyPublicCtor = constructor.Any(x => x.IsPublic);
-      if (!anyPublicCtor) throw new MustHavePublicConstructorException(classResult.Type);
-      var anyEmptyCtor = constructor.Any(x => x.GetParameters().Length == 0);
-      if (!anyEmptyCtor) throw new MustHaveParameterlessConstructorException(classResult.Type);
       var instance = ActivatorUtilities.CreateInstance(app.Services, classResult.Type);
-      if (instance is null)
+      if (instance is not BaseEndpoint casted)
         continue;
-      var methods = classResult.Type.GetEndpointHandlerMethods();
-      foreach (var methodResult in methods) {
-        var methodDelegate = methodResult.Method.CreateDelegate(methodResult.Method.GetDelegateType(), instance);
-        var path = InternalUtils.GetUrlPath(options,
-                                            classResult.Route,
-                                            classResult.Type.Name,
-                                            classResult.Type.GetContainingFolderName(),
-                                            mainName);
-        var globalFilters = options.EndpointFilters;
-        foreach (var httpMethod in classResult.HttpMethods) {
-          var call = httpMethod switch {
-            HttpMethodType.POST => app.MapPost(path, methodDelegate),
-            HttpMethodType.GET => app.MapGet(path, methodDelegate),
-            HttpMethodType.PUT => app.MapPut(path, methodDelegate),
-            HttpMethodType.DELETE => app.MapDelete(path, methodDelegate),
-            HttpMethodType.PATCH => app.MapPatch(path, methodDelegate),
-            _ => throw new ArgumentOutOfRangeException(nameof(httpMethod))
-          };
-          if (options.AuthorizeData is not null) call.RequireAuthorization(options.AuthorizeData);
-          if (classResult.Authorize is not null) call.RequireAuthorization(classResult.Authorize);
-          foreach (var filterItem in globalFilters)
-            if (ActivatorUtilities.CreateInstance(app.Services, filterItem) is IEndpointFilter filter)
-              call.AddEndpointFilter(filter);
-          foreach (var filterItem in classResult.Filters)
-            if (ActivatorUtilities.CreateInstance(app.Services, filterItem) is IEndpointFilter filter)
-              call.AddEndpointFilter(filter);
-        }
-      }
+      var methodDelegate = classResult.EndpointMethod.CreateDelegate(classResult.EndpointMethod.GetDelegateType(), instance);
+      var apiPath = classResult.Type.CreateApiPathFromAssembly(classResult.EndpointAttribute);
+      var call = classResult.EndpointAttribute.Method switch {
+        HttpMethodType.Post => app.MapPost(apiPath, methodDelegate),
+        HttpMethodType.Get => app.MapGet(apiPath, methodDelegate),
+        HttpMethodType.Put => app.MapPut(apiPath, methodDelegate),
+        HttpMethodType.Delete => app.MapDelete(apiPath, methodDelegate),
+        HttpMethodType.Patch => app.MapPatch(apiPath, methodDelegate),
+        _ => throw new ArgumentOutOfRangeException(nameof(HttpMethodType))
+      };
+      if (EndpointOptions.Options.AuthorizeData is not null) call.RequireAuthorization(EndpointOptions.Options.AuthorizeData);
+      if (classResult.Authorize is not null) call.RequireAuthorization(classResult.Authorize);
+      foreach (var filterItem in EndpointOptions.Options.EndpointFilters)
+        if (ActivatorUtilities.CreateInstance(app.Services, filterItem) is IEndpointFilter filter)
+          call.AddEndpointFilter(filter);
+      foreach (var filterItem in classResult.Filters)
+        if (ActivatorUtilities.CreateInstance(app.Services, filterItem) is IEndpointFilter filter)
+          call.AddEndpointFilter(filter);
     }
   }
 }

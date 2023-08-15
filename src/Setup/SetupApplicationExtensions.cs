@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 
 namespace AspNetCore.MinimalApi.Ext.Setup;
 
-public static class SetupApplicationMiddlewareExtensions
+public static class SetupApplicationExtensions
 {
   /// <summary>
   ///   This will enable any classes implementing IApplicationSetup
