@@ -12,7 +12,7 @@
     <RepositoryUrl>https://github.com/bberka/Selfrated.MinimalAPI.Middleware</RepositoryUrl>
     <PackageTags>MinimalAPI;Middleware;Endpoints;ASPNetCore</PackageTags>
     <Authors>Edward Elyn, bberka</Authors>
-    <Version>3.2.0-alpha</Version>
+    <Version>3.2.1-beta</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
