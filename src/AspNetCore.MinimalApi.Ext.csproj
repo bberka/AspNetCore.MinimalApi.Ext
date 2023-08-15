@@ -35,8 +35,5 @@
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Attributes\Base\" />
-  </ItemGroup>
 
 </Project>
