@@ -2,7 +2,7 @@
 
 namespace AspNetCore.MinimalApi.Ext;
 
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
 public class EndpointFilterAttribute : Attribute
 {
   public EndpointFilterAttribute(Type type) {

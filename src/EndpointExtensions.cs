@@ -52,24 +52,37 @@ public static class EndpointExtensions
       var instance = ActivatorUtilities.CreateInstance(app.Services, classResult.Type);
       if (instance is null)
         continue;
-      var methodDelegate = classResult.EndpointMethod.CreateDelegate(classResult.EndpointMethod.GetDelegateType(), instance);
-      var apiPath = classResult.Type.CreateApiPathFromAssembly(classResult.EndpointAttribute);
-      var call = classResult.EndpointAttribute.Method switch {
-        HttpMethodType.Post => app.MapPost(apiPath, methodDelegate),
-        HttpMethodType.Get => app.MapGet(apiPath, methodDelegate),
-        HttpMethodType.Put => app.MapPut(apiPath, methodDelegate),
-        HttpMethodType.Delete => app.MapDelete(apiPath, methodDelegate),
-        HttpMethodType.Patch => app.MapPatch(apiPath, methodDelegate),
-        _ => throw new ArgumentOutOfRangeException(nameof(HttpMethodType))
-      };
-      if (EndpointOptions.Options.AuthorizeData is not null) call.RequireAuthorization(EndpointOptions.Options.AuthorizeData);
-      if (classResult.Authorize is not null) call.RequireAuthorization(classResult.Authorize);
-      foreach (var filterItem in EndpointOptions.Options.EndpointFilters)
-        if (ActivatorUtilities.CreateInstance(app.Services, filterItem) is IEndpointFilter filter)
-          call.AddEndpointFilter(filter);
-      foreach (var filterItem in classResult.Filters)
-        if (ActivatorUtilities.CreateInstance(app.Services, filterItem) is IEndpointFilter filter)
-          call.AddEndpointFilter(filter);
+      foreach (var method in classResult.Endpoints) {
+        var methodDelegate = method.MethodInfo.CreateDelegate(method.MethodInfo.GetDelegateType(), instance);
+        if (method.Endpoint is null) continue;
+        var apiPath = EndpointOptions.Options.UseGlobalPrefix
+                        ? EndpointOptions.Options.GlobalPrefix + method.Endpoint.Route
+                        : method.Endpoint.Route;
+        apiPath = apiPath.Replace("//", "/");
+        var call = method.Endpoint.Method switch {
+          HttpMethodType.Post => app.MapPost(apiPath, methodDelegate),
+          HttpMethodType.Get => app.MapGet(apiPath, methodDelegate),
+          HttpMethodType.Put => app.MapPut(apiPath, methodDelegate),
+          HttpMethodType.Delete => app.MapDelete(apiPath, methodDelegate),
+          HttpMethodType.Patch => app.MapPatch(apiPath, methodDelegate),
+          _ => throw new ArgumentOutOfRangeException(nameof(HttpMethodType))
+        };
+        if (EndpointOptions.Options.AuthorizeData is not null)
+          call.RequireAuthorization(EndpointOptions.Options.AuthorizeData);
+        if (classResult.Authorize is not null)
+          call.RequireAuthorization(classResult.Authorize);
+        if (method.Authorize is not null)
+          call.RequireAuthorization(method.Authorize);
+        foreach (var filterItem in EndpointOptions.Options.EndpointFilters)
+          if (ActivatorUtilities.CreateInstance(app.Services, filterItem) is IEndpointFilter filter)
+            call.AddEndpointFilter(filter);
+        foreach (var filterItem in classResult.Filters)
+          if (ActivatorUtilities.CreateInstance(app.Services, filterItem) is IEndpointFilter filter)
+            call.AddEndpointFilter(filter);
+        foreach (var filterItem in method.Filters)
+          if (ActivatorUtilities.CreateInstance(app.Services, filterItem) is IEndpointFilter filter)
+            call.AddEndpointFilter(filter);
+      }
     }
   }
 }

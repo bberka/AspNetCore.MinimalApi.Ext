@@ -11,13 +11,13 @@ internal sealed class ExportedClassTypeResult
     var allowAnonymous = type.GetCustomAttribute<AllowAnonymousAttribute>();
     if (allowAnonymous is not null) Authorize = null;
     Filters = type.GetCustomAttributes<EndpointFilterAttribute>().Select(x => x.Type).ToArray();
-    var endpoint = type.GetCustomAttribute<EndpointAttribute>();
-    if (endpoint is not null)  EndpointAttribute = endpoint;
-    else EndpointAttribute = new EndpointAttribute();
+    Endpoints = type.GetMethods()
+                    .Where(x => x.GetCustomAttribute<EndpointAttribute>() != null && x is { IsPublic: true, IsStatic: false })
+                    .Select(x => new ExportedMethodTypeResult(x))
+                    .ToList();
   }
   public Type Type { get; }
   public Type[] Filters { get; }
   public IAuthorizeData? Authorize { get; }
-  public EndpointAttribute EndpointAttribute { get; }
-  public MethodInfo EndpointMethod { get; set; }
+  public List<ExportedMethodTypeResult> Endpoints { get; set; }
 }
